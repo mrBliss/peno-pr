@@ -298,7 +298,8 @@ public class MuurvolgerBehavior implements Behavior {
 	 * The threshold is used to filter out fluke distance measurements
 	 */
 	private boolean isOpenSpaceDetected() {
-		return openSpaceCounter > openSpaceCounterThreshold;
+		//return openSpaceCounter > openSpaceCounterThreshold;
+		return false;
 	}
 
     /**

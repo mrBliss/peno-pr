@@ -47,6 +47,10 @@ public class RobotSpecs {
     
     
     
+    private static final int mm2cm = 10;
+    
+    
+    
     /**
      * calculate time needed in millisecond to traverse a certain distance at
      * a given speed.
@@ -56,7 +60,19 @@ public class RobotSpecs {
      * @return
      */
     public static long timeToTravel(int speed, int length){
-    	return (long) ((length * 360 * 1000 * 10)/(wheelDiameter*speed*Math.PI));
+    	return (long) ((length * 360 * 1000 * mm2cm)/(wheelDiameter*speed*Math.PI));
+    }
+    
+    /**
+     * 
+     * calculate the traveled distance in cm given for a certain amount of wheel rotation
+     * in degrees
+     * 
+     * @param degrees the number of degrees a wheel rotated
+     * @return the distance traveled
+     */
+    public static float distance(int degrees){
+    	return  (float) (wheelDiameter*degrees*Math.PI/(360*mm2cm));
     }
     
     

@@ -1,9 +1,11 @@
 package geel;
 
+import java.io.PrintStream;
+
 import geel.behaviours.MuurvolgerBehavior;
 import lejos.nxt.Button;
-import lejos.nxt.Sound;
 import lejos.nxt.UltrasonicSensor;
+import lejos.nxt.comm.RConsole;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
@@ -29,20 +31,13 @@ public class WallTracker {
 
 
     public static void main(String args[]) throws Exception {
-//    	int timeout = 0;
-//		RConsole.openBluetooth(timeout);
-		//block until 
+    	
+    	//wait for remote console to connect
+    	int timeout = 0;
+		RConsole.openBluetooth(timeout);
+		System.setOut(new PrintStream(RConsole.openOutputStream()));
     	    	
-        /* I'm alive :-) */
-    	Sound.setVolume(8);
-        Sound.beepSequenceUp();
         
-        /* calibrate sensors*/
-//        calibrateSonar(); 
-
-		
-
-
         /* instantiate an array of behaviors that will control the robot
          * from lowest to highest  behavior priority
          */
@@ -52,8 +47,6 @@ public class WallTracker {
         
         
         /* instantiate an arbitrator */
-        System.out.println("press enter to start");
-        Button.ENTER.waitForPress();
         System.out.println("program starting");
         (new Arbitrator(bArray)).start();
     }

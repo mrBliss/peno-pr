@@ -30,7 +30,7 @@
 	
 	<!-- seperated src and bin directories -->
 	<property name="src" location="./src" />
-	<property name="bin" location="./bin" />
+	<property name="bin" location="./antbin" />
 
 	<!-- output file of linker -->
 	<property name="program" value="${mainClass}"/>

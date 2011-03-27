@@ -28,6 +28,13 @@ public class MuurvolgerBehavior implements Behavior {
     //number of times an open space must be repeatedly detected for it not to be a fluke
     private static int openSpaceCounterThreshold = 3;
     
+	/*
+	 * count the number of times that the sonar repeatedly detects a open space.
+	 * (ie. distance > tileWidth)
+	 * reset to zero if a wall is detected
+	 */
+	private int openSpaceCounter = 0;
+    
     //new and previous sonar sample value
     private int newDistance;
     private int prevDistance;
@@ -47,7 +54,6 @@ public class MuurvolgerBehavior implements Behavior {
     			// sample sonar sensor
     			prevDistance = newDistance;
     			newDistance = ultra.getDistance();
-    			Robot.lastDistance = newDistance;
     			
     			
     			updateOpenSpaceCounter();
@@ -66,9 +72,9 @@ public class MuurvolgerBehavior implements Behavior {
     	private void updateOpenSpaceCounter() {
     		// if the sonar value if larger then the tile width then there is an open space
     		if (newDistance > TrackSpecs.tileWidth) {
-    			Robot.openSpaceCounter++;
+    			openSpaceCounter++;
     		} else {
-    			Robot.openSpaceCounter = 0;
+    			openSpaceCounter = 0;
     		}
     	}
     });
@@ -128,6 +134,10 @@ public class MuurvolgerBehavior implements Behavior {
         	motorLeft.setSpeed(100);
             motorRight.setSpeed(900);
         }
+        
+        // move forward in case we are standing still
+       	this.motorLeft.forward();
+    	this.motorRight.forward();
 
         //continue arc motion long enough to complete arc motion
         //but break if action if suppressed
@@ -156,6 +166,10 @@ public class MuurvolgerBehavior implements Behavior {
             motorRight.setSpeed(200);
             motorLeft.setSpeed(900);
         }
+        
+        // move forward in case we are standing still
+       	this.motorLeft.forward();
+    	this.motorRight.forward();
 
         //continue arc motion long enough to complete arc motion
         //but break if action if suppressed
@@ -190,6 +204,10 @@ public class MuurvolgerBehavior implements Behavior {
             motorRight.setSpeed(400);
             motorLeft.setSpeed(900);
         }
+        
+        // move forward in case we are standing still
+       	this.motorLeft.forward();
+    	this.motorRight.forward();
         
         //continue motion long enough to complete arc motion
         //but break if action if suppressed

@@ -58,6 +58,7 @@ public class Robot {
 	
 	public static Character code;
 	
+	//fixme: don't use global vars
 	public static int lastDistance;
    
 

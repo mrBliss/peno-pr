@@ -11,18 +11,12 @@
 package pcpanic;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EmptyStackException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import lejos.pc.comm.NXTComm;
-import lejos.pc.comm.NXTCommandConnector;
+
 import pcpanic.NXT.Pilot;
-
-
 import pcpanic.Server.Server;
 
 /**

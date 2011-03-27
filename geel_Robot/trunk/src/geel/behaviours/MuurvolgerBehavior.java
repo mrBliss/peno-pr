@@ -33,8 +33,48 @@ public class MuurvolgerBehavior implements Behavior {
     private int prevDistance;
     
     // boolean indicating if a new sonar sample is available
-    private boolean newSonarSampleAvailable = false;
+    private boolean newDistanceSampleAvailable = false;
 
+    /**
+     * Thread that periodically samples the sonar sensor
+     * keeping track of the previous and the current sensor value
+     * and setting a newValue boolean to true to indicate a new sample has been taken.
+     */
+    private final Thread distanceSamplerThread = new Thread(new Runnable() {
+    	
+    	
+    	public void run() {
+    		long periodMs = 200;
+    		while (true) {
+    			// sample sonar sensor
+    			prevDistance = newDistance;
+    			newDistance = ultra.getDistance();
+    			Robot.lastDistance = newDistance;
+    			
+    			newDistanceSampleAvailable = true;
+    			
+    			updateOpenSpaceCounter();
+    			
+    			try {
+    				Thread.sleep(periodMs);
+    			} catch (InterruptedException ex) {
+    			}
+    		}
+    	}
+    	
+    	/**
+    	 * Count the number of times we repeatedly see an open space in the 
+    	 * direction of the sonar. The count is reset once if a wall is detected.
+    	 */
+    	private void updateOpenSpaceCounter() {
+    		// if the sonar value if larger then the tile width then there is an open space
+    		if (newDistance > TrackSpecs.tileWidth) {
+    			Robot.openSpaceCounter++;
+    		} else {
+    			Robot.openSpaceCounter = 0;
+    		}
+    	}
+    });
     
     // boolean indicating if the behavior is being suppressed
     private boolean supressed = false;
@@ -44,49 +84,6 @@ public class MuurvolgerBehavior implements Behavior {
     private UltrasonicSensor ultra;
 	private Motor motorLeft;
 	private Motor motorRight;
-    
-    /**
-     * Thread that periodically samples the sonar sensor
-     * keeping track of the previous and the current sensor value
-     * and setting a newValue boolean to true to indicate a new sample has been taken.
-     */
-    private final Thread distanceSamplerThread = new Thread(new Runnable() {
-
-        public void run() {
-        	long periodMs = 200;
-            while (true) {
-            	// sample sonar sensor
-                prevDistance = newDistance;
-                newDistance = ultra.getDistance();
-                Robot.lastDistance = newDistance;
-                
-                newSonarSampleAvailable = true;
-                        
-                updateOpenSpaceCounter();
-
-                try {
-                	Thread.sleep(periodMs);
-                } catch (InterruptedException ex) {
-                }
-            }
-        }
-
-		/**
-		 * Count the number of times we repeatedly see an open space in the 
-		 * direction of the sonar. The count is reset once if a wall is detected.
-		 */
-		private void updateOpenSpaceCounter() {
-			// if the sonar value if larger then the tile width then there is an open space
-			if (newDistance > TrackSpecs.tileWidth) {
-			    Robot.openSpaceCounter++;
-			} else {
-			    Robot.openSpaceCounter = 0;
-			}
-		}
-    });
-
-
-
 
 
 
@@ -224,7 +221,7 @@ public class MuurvolgerBehavior implements Behavior {
         }
         
         //indicate that the sonar sample has been processed.
-        newSonarSampleAvailable = false;
+        newDistanceSampleAvailable = false;
     }
 
     /**
@@ -264,7 +261,7 @@ public class MuurvolgerBehavior implements Behavior {
      */
     @Override
     public boolean takeControl() {
-        return (newSonarSampleAvailable && ((isWallToClose() && newDistance < prevDistance) || (isWallToFar() && newDistance > prevDistance) || (Robot.openSpaceCounter > 3)));
+        return (newDistanceSampleAvailable && ((isWallToClose() && newDistance < prevDistance) || (isWallToFar() && newDistance > prevDistance) || (Robot.openSpaceCounter > 3)));
 
     }
 }

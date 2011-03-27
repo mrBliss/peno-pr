@@ -82,8 +82,9 @@ public class Pilot {
     }
 
     public final void connect() throws Exception {
-    	NXTComm open = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
-    	open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "WallE", "00:16:53:02:F7:9D"));
+    	open = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
+    	//open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "WallE", "00:16:53:02:F7:9D"));
+    	open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "ROOD", "00:16:53:06:23:A0"));
         outputStream = open.getOutputStream();
         inputStream = open.getInputStream();
     }

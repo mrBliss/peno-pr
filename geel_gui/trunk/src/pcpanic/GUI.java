@@ -11,12 +11,21 @@
 package pcpanic;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EmptyStackException;
-
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import lejos.pc.comm.NXTComm;
+import lejos.pc.comm.NXTCommandConnector;
 import pcpanic.NXT.Pilot;
+
+
 import pcpanic.Server.Server;
 
 /**
@@ -95,7 +104,7 @@ public class GUI extends javax.swing.JFrame {
         turtlePane1 = new ch.aplu.turtle.TurtlePane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("P&O Team GEEL GUI");
+        setTitle("P&O DEMO");
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         setIconImage(Toolkit.getDefaultToolkit().getImage(GUI.class.getResource("nxt.png")));
 
@@ -144,12 +153,15 @@ public class GUI extends javax.swing.JFrame {
         txtRem.setRows(1);
         txtRem.setTabSize(0);
         txtRem.setEnabled(false);
-        txtRem.addKeyListener(new java.awt.event.KeyAdapter() {
+        txtRem.addKeyListener(new java.awt.event.KeyAdapter() {	
             public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtRemKeyPresser(evt);
+                	txtRemKeyPresser(evt);
             }
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                txtRemKeyReleased(evt);
+                	txtRemKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                //txtRemKeyReleased(evt);
             }
         });
         jScrollPane1.setViewportView(txtRem);
@@ -484,6 +496,11 @@ public class GUI extends javax.swing.JFrame {
         streamPane1.setBackground(new java.awt.Color(240, 240, 240));
         streamPane1.setEditable(false);
         jScrollPane3.setViewportView(streamPane1);
+        jScrollPane3.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {  
+        	 public void adjustmentValueChanged(AdjustmentEvent e) {  
+        	 e.getAdjustable().setValue(e.getAdjustable().getMaximum());  
+        	 }});  
+        
 
         jTabbedPane2.addTab("Console", jScrollPane3);
 
@@ -544,60 +561,79 @@ public class GUI extends javax.swing.JFrame {
 
     private void txtRemKeyPresser(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRemKeyPresser
         txtRem.setText("");
-        char ch = evt.getKeyChar();
+        int ch = evt.getKeyCode();
+        //System.out.println("key pressed "+ch+" @ "+evt.getWhen());
         switch (ch) {
-            case 'a':
-                p.setL(90);
-                p.setR(90);
+//            case 'a': // forward fullspeed
+//                p.setL(90);
+//                p.setR(90);
+//                p.apply();
+//                break;
+//            case 'e': // backward fullspeed
+//                p.setL(-90);
+//                p.setR(-90);
+//                p.apply();
+//                break;
+            case java.awt.event.KeyEvent.VK_LEFT: // left ?
+                int currRspeed = p.getR();
+                p.setR(currRspeed + 20);
+                p.apply();
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                p.setR(currRspeed);
                 p.apply();
                 break;
-            case 'e':
-                p.setL(-90);
-                p.setR(-90);
+            case java.awt.event.KeyEvent.VK_RIGHT: // right
+                int currLspeed = p.getL();
+                p.setL(currLspeed + 20);
+                p.apply();
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                p.setL(currLspeed);
                 p.apply();
                 break;
-            case 'q':
-                p.difL(-5);
+            case java.awt.event.KeyEvent.VK_UP:
+                p.meanSpeed(); // increase speed
+                p.difL(5);
                 p.difR(5);
                 p.apply();
+                p.apply();
                 break;
-            case 'd':
-                p.difL(5);
+            case java.awt.event.KeyEvent.VK_DOWN:
+                p.meanSpeed(); //decrease speed
+                p.difL(-5);
                 p.difR(-5);
                 p.apply();
                 break;
-            case 'z':
-                p.meanSpeed();
-                p.difL(5);
-                p.difR(5);
-                p.apply();
+            case java.awt.event.KeyEvent.VK_ENTER:
+                p.meanSpeed(); // ??
                 p.apply();
                 break;
-            case 's':
-                p.meanSpeed();
-                p.difL(-5);
-                p.difR(-5);
+            case java.awt.event.KeyEvent.VK_ESCAPE:
+            case java.awt.event.KeyEvent.VK_SPACE:
+                p.fullStop(); // stop
                 p.apply();
                 break;
-            case '\n':
-                p.meanSpeed();
-                p.apply();
-                break;
-            case 'à':
-                p.fullStop();
-                p.apply();
-                break;
-            case 'µ':
+            case java.awt.event.KeyEvent.VK_BACK_SPACE: // reverse
                 p.multL(-1);
                 p.multR(-1);
                 p.apply();
                 break;
-            case ' ':
+            case java.awt.event.KeyEvent.VK_H: // honk
                 p.toeter(3);
         }
     }//GEN-LAST:event_txtRemKeyPresser
 
     private void txtRemKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRemKeyReleased
+    	//System.out.println("key released: "+evt.getKeyCode()+" @ "+evt.getWhen());
 }//GEN-LAST:event_txtRemKeyReleased
 
     private void txtCustomKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCustomKeyTyped
@@ -634,19 +670,21 @@ public class GUI extends javax.swing.JFrame {
         }
 
 
-    }//GEN-LAST:event_buttonActiveActionPerformed
+    }//GEN-LAST:event_buttonActiveActionPerformed 
 
     private void toggleConnectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toggleConnectionActionPerformed
         if (toggleConnection.isSelected()) {
 
             try {
+            	System.out.println("Making new pilot class");
                 p = new Pilot(sliderL, sliderR);
+                System.out.println("Pilot class created");
                 buttonActive.setEnabled(true);
                 txtCustom.setEnabled(true);
                 jButton6.setEnabled(true);
                 toggleConnection.setText("Disconnect NXT");
             } catch (Exception ex) {
-                System.err.println("Connecteren mislukt "+ex);
+                System.err.println("Connecteren mislukt: " + ex);
                 toggleConnection.setSelected(false);
             }
         } else {

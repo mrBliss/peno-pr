@@ -1,7 +1,10 @@
 package pcpanic;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import javax.swing.JTextPane;
 
@@ -10,9 +13,16 @@ import javax.swing.JTextPane;
 public class StreamPane extends JTextPane {
 
     private HashMap<InputStream,PollThread> map;
+    FileWriter fstream;
 
     public StreamPane() {
         map = new HashMap<InputStream,PollThread>();
+		try {
+			fstream = new FileWriter("streampane2.txt", true);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 
@@ -37,6 +47,13 @@ public class StreamPane extends JTextPane {
 
     public void append(String t){
         setText(getText()+t);
+        try {
+			fstream.write(t);
+			fstream.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
 
@@ -59,13 +76,14 @@ public class StreamPane extends JTextPane {
                     char ch = (char) stream.read();
                     if (ch != (char) -1) {
                         //append(""+ch);
-                        setCaretPosition(getDocument().getLength());
+                        //setCaretPosition(getDocument().getLength());
                         if(ch == '\n'){
                             if(GUI.ts != null && line.startsWith("Turtle")){
                                 GUI.ts.moveTurtle(line.charAt(7));
                             }
 
                             append(line+"\n");
+
                             line = "";
                         }else{
                            line+=ch;

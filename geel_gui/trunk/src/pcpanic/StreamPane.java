@@ -18,7 +18,7 @@ public class StreamPane extends JTextPane {
     public StreamPane() {
         map = new HashMap<InputStream,PollThread>();
 		try {
-			fstream = new FileWriter("streampane2.txt", true);
+			fstream = new FileWriter("robotlog.txt", true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

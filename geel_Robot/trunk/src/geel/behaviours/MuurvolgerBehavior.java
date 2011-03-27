@@ -131,6 +131,9 @@ public class MuurvolgerBehavior implements Behavior {
         		isOpenSpaceDetected();
     }
     
+	private long oldTiming = 0;
+	private long newTiming = 0;
+    
     /**
      * action of this behavior.
      * 
@@ -150,15 +153,36 @@ public class MuurvolgerBehavior implements Behavior {
     	this.isSupressed = false;
         
 		if (isOpenSpaceDetected()) {
-			System.out.println("A: turn to sonar");
+			oldTiming = newTiming;
+			newTiming = System.currentTimeMillis();
+			System.out.println("A: turn to sonar "+ (newTiming -oldTiming));
+			
             turnToOpenSpace();
+            
+			oldTiming = newTiming;
+			newTiming = System.currentTimeMillis();
+			System.out.println("AE: turn to sonar "+ (newTiming -oldTiming));
         } 
 		else if (isWallToClose()) {
-			System.out.println("A: turn from wall");
+			oldTiming = newTiming;
+			newTiming = System.currentTimeMillis();
+			System.out.println("A: turn from wall "+ (newTiming -oldTiming));
+			
             turnFromWall();
+            
+            oldTiming = newTiming;
+            newTiming = System.currentTimeMillis();
+            System.out.println("AE: turn from wall " + (newTiming -oldTiming) );
         } else if (isWallToFar()) {
-        	System.out.println("A: turn to wall");
+			oldTiming = newTiming;
+			newTiming = System.currentTimeMillis();
+			System.out.println("A: turn to wall "+ (newTiming -oldTiming));
+			
             turnToWall();
+            
+			oldTiming = newTiming;
+			newTiming = System.currentTimeMillis();
+			System.out.println("AE: turn to wall "+ (newTiming -oldTiming));
         }
         
 		this.isActionInProgress = false;

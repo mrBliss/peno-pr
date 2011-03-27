@@ -32,8 +32,6 @@ public class MuurvolgerBehavior implements Behavior {
     private int newDistance;
     private int prevDistance;
     
-    // boolean indicating if a new sonar sample is available
-    private boolean newDistanceSampleAvailable = false;
 
     /**
      * Thread that periodically samples the sonar sensor
@@ -51,7 +49,6 @@ public class MuurvolgerBehavior implements Behavior {
     			newDistance = ultra.getDistance();
     			Robot.lastDistance = newDistance;
     			
-    			newDistanceSampleAvailable = true;
     			
     			updateOpenSpaceCounter();
     			
@@ -75,6 +72,10 @@ public class MuurvolgerBehavior implements Behavior {
     		}
     	}
     });
+    
+    // boolean indication that this behaviour is busy performing an action
+    // prevening this behaviour to be preemted by itself through the arbitrator.
+    private boolean isActionInProgress = false;
     
     // boolean indicating if the behavior is being suppressed
     private boolean supressed = false;
@@ -102,6 +103,9 @@ public class MuurvolgerBehavior implements Behavior {
         this.motorLeft = motorLeft;
         this.motorRight = motorRight;
         
+        // behaviour is not performing actions after its created
+        this.isActionInProgress = false;
+        
         //initialize the sonar old and new sample value to the setpoint
         prevDistance = sonarSetPoint;
         newDistance = sonarSetPoint;
@@ -125,7 +129,8 @@ public class MuurvolgerBehavior implements Behavior {
             motorRight.setSpeed(900);
         }
 
-        //continue arc motion long enough
+        //continue arc motion long enough to complete arc motion
+        //but break if action if suppressed
         int arcDurationMs = 50;
 		long target = System.currentTimeMillis() + arcDurationMs;
         while (System.currentTimeMillis() < target && !supressed) {
@@ -152,7 +157,8 @@ public class MuurvolgerBehavior implements Behavior {
             motorLeft.setSpeed(900);
         }
 
-        //continue arc motion long enough
+        //continue arc motion long enough to complete arc motion
+        //but break if action if suppressed
         int arcDurationMs = 75;
 		long target = System.currentTimeMillis() + arcDurationMs;
         while (System.currentTimeMillis() < target && !supressed) {
@@ -185,14 +191,16 @@ public class MuurvolgerBehavior implements Behavior {
             motorLeft.setSpeed(900);
         }
         
-        //continue arc motion long enough
+        //continue motion long enough to complete arc motion
+        //but break if action if suppressed
         int arcDurationMs = 800;
 		long timeTarget = System.currentTimeMillis() + arcDurationMs;
         while (!supressed && System.currentTimeMillis() < timeTarget){
         	Thread.yield();
         }
         
-        // drive straight until there is again a wall detected
+        //drive straight until there is again a wall detected
+        //but again break if action if suppressed
         motorLeft.setSpeed(900);
         motorRight.setSpeed(900);
         while (newDistance > 80 && !supressed){
@@ -208,9 +216,13 @@ public class MuurvolgerBehavior implements Behavior {
      *  + if we are to far form the wall then the robat arcs towards it.
      *  + if we detect an open space in the sonar direction then the robot turn towards it
      *  and drives forward until it again detects a wall
+     *  
+     *  only return if suppressed or motion completed!
+     *  after which the robot drives straight again.
      */
     @Override
     public void action() {
+    	this.isActionInProgress = true;
         
 		if (isOpenSpaceDetected()) {		
             turnToOpenSpace();
@@ -220,8 +232,7 @@ public class MuurvolgerBehavior implements Behavior {
             arcToWall();
         }
         
-        //indicate that the sonar sample has been processed.
-        newDistanceSampleAvailable = false;
+		this.isActionInProgress = false;
     }
 
     /**
@@ -249,7 +260,7 @@ public class MuurvolgerBehavior implements Behavior {
 	}
 
     /**
-     * Actie die ondernomen wordt wanneer de muurvolgerbehavior verlaten wordt
+     * used by the arbitrator to suppress this behaviour
      */
     @Override
     public void suppress() {
@@ -257,11 +268,17 @@ public class MuurvolgerBehavior implements Behavior {
     }
 
     /**
-     * Beslist wanneer de muurvolgerbehavior actief wordt.
+     * used by the arbitrator to check if this behavior want to be active.
+     * which is the case if the robot is to far or to close to the wall
+     * or detects an open space in the direction of it sonar
      */
     @Override
     public boolean takeControl() {
-        return (newDistanceSampleAvailable && ((isWallToClose() && newDistance < prevDistance) || (isWallToFar() && newDistance > prevDistance) || (Robot.openSpaceCounter > 3)));
+        return 	!isActionInProgress && ( 
+        			(isWallToClose() && newDistance < prevDistance) ||
+        			(isWallToFar() && newDistance > prevDistance) ||
+        			isOpenSpaceDetected()
+        			);
 
     }
 }

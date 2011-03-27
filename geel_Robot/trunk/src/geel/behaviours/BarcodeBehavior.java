@@ -4,6 +4,7 @@ package geel.behaviours;
 import geel.Robot;
 import geel.track.TrackTracker;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -71,6 +72,13 @@ public class BarcodeBehavior implements Behavior {
 		this.motorLeft = motorLeft;
 		this.motorRight = motorRight;
 
+	}
+	
+	private void printReadings(ArrayList<Integer> readings) {
+		for(Integer i: readings) {
+			System.out.print(""+i.intValue()+",");
+		}
+		System.out.println();
 	}
 
 	/**
@@ -140,20 +148,22 @@ public class BarcodeBehavior implements Behavior {
 
 			// laatste minReadings waardes verwijderen aangezien deze vals
 			// worden opgeslaan. Zie done > minReadings
-			// System.out.println("GROND:  " + readings.get(readings.size() -
-			// 1));
+			 System.out.println("GROND:  " + readings.get(readings.size() - 1));
 			for (int i = 0; i < minReadings; i++) {
 				readings.remove(readings.size() - 1);
 			}
 			// de waardes gemeten tijdens het over de barcode rijden moeten
 			// gedecodeerd worden.
+			System.out.print("Print readings: ");
+			printReadings(readings);
+			
 			Robot.code = decodeReadings(readings);
 		}
 		setMainArc(true);
 
-		// if(!trackTracker.getTrackCompleted()){
-		// trackTracker.updateTrack();
-		// System.out.println("Turtle " + code);}
+		 if(!trackTracker.getTrackCompleted()){
+		 //trackTracker.updateTrack();
+		 System.out.println("Turtle " + Robot.code);}
 	}
 
 	/**

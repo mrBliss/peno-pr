@@ -76,6 +76,8 @@ public class Manual implements Behavior {
                     byte ml = str.readByte();
                     byte mr = str.readByte();
                     Sound.playTone(ml * 10, mr * 10);
+                } else if (bt == 22) {
+                	System.exit(0);
                 }
             } catch (Exception ex) {
                 Sound.buzz();

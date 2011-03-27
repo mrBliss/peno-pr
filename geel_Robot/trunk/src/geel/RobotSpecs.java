@@ -20,6 +20,12 @@ import lejos.nxt.TachoMotorPort;
 public class RobotSpecs {
 	
 	/**
+	 * Wheel diameter in mm
+	 */
+	public static int wheelDiameter = 56;
+	
+	
+	/**
 	 * specify the to which side the sonar is pointed
 	 */
 	public static boolean sonarPointsLeft = true;
@@ -38,6 +44,20 @@ public class RobotSpecs {
     public  static SensorPort lightSensorPort = SensorPort.S1;
     public  static SensorPort touchSensorFrontPort = SensorPort.S2;
     public  static SensorPort sonarSensorPort = SensorPort.S3;
+    
+    
+    
+    /**
+     * calculate time needed in millisecond to traverse a certain distance at
+     * a given speed.
+     * 
+     * @param speed speed of the motor in degrees per second 
+     * @param distance length to travers in cm
+     * @return
+     */
+    public static long timeToTravel(int speed, int length){
+    	return (long) ((length * 360 * 1000 * 10)/(wheelDiameter*speed*Math.PI));
+    }
     
     
 

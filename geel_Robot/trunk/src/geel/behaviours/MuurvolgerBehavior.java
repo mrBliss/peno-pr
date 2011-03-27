@@ -1,6 +1,5 @@
 package geel.behaviours;
 
-import geel.Robot;
 import geel.RobotSpecs;
 import geel.TrackSpecs;
 import lejos.nxt.Motor;
@@ -55,7 +54,7 @@ public class MuurvolgerBehavior implements Behavior {
     			prevDistance = newDistance;
     			newDistance = ultra.getDistance();
     			
-    			
+    			//System.out.println(newDistance);
     			updateOpenSpaceCounter();
     			
     			try {
@@ -84,7 +83,7 @@ public class MuurvolgerBehavior implements Behavior {
     private boolean isActionInProgress = false;
     
     // boolean indicating if the behavior is being suppressed
-    private boolean supressed = false;
+    private boolean isSupressed = false;
     
     
     // references to the sonar sensor and robot motors  needed by this behaviour
@@ -118,12 +117,58 @@ public class MuurvolgerBehavior implements Behavior {
         
         distanceSamplerThread.start();
     }
+    
+    /**
+     * used by the arbitrator to check if this behavior want to be active.
+     * which is the case if the robot is to far or to close to the wall
+     * or detects an open space in the direction of it sonar
+     */
+    @Override
+    public boolean takeControl() {
+    	
+        return 	(isWallToClose() && isGettingCloser()) ||
+        		(isWallToFar() && isGettingFurther()) ||
+        		isOpenSpaceDetected();
+    }
+    
+    /**
+     * action of this behavior.
+     * 
+     *  + if we are to close to the wall then the robot turns away form it.
+     *  + if we are to far form the wall then the robot turns towards it.
+     *  + if we detect an open space in the sonar direction then the robot rotates towards it
+     *  and drives forward over the length of one tile
+     *  
+     *  returns if suppressed or motion completed!
+     *  after which the robot drives straight again.
+     */
+    @Override
+    public void action() {
+    	this.isActionInProgress = true;
+    	
+    	//reset suppressed flag
+    	this.isSupressed = false;
+        
+		if (isOpenSpaceDetected()) {
+			System.out.println("A: turn to sonar");
+            turnToOpenSpace();
+        } 
+		else if (isWallToClose()) {
+			System.out.println("A: turn from wall");
+            turnFromWall();
+        } else if (isWallToFar()) {
+        	System.out.println("A: turn to wall");
+            turnToWall();
+        }
+        
+		this.isActionInProgress = false;
+    }
 
     /**
-     * arc away form the wall that the sonar is pointing to.
-     * 
+     * turn away form the wall that the sonar is pointing to
+     * then continue straight on
      */
-    private void arcFromWall() {
+    private void turnFromWall() {
     	//fixme: magic numbers
         if (RobotSpecs.sonarPointsLeft) {
         	//arc to the right
@@ -143,7 +188,7 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 50;
 		long target = System.currentTimeMillis() + arcDurationMs;
-        while (System.currentTimeMillis() < target && !supressed) {
+        while (System.currentTimeMillis() < target && !isSupressed) {
             Thread.yield();
         }
         
@@ -153,9 +198,10 @@ public class MuurvolgerBehavior implements Behavior {
     }
 
     /**
-     * arc towards the wall that the sonar is pointing to.
+     * turn towards the wall that the sonar is pointing to
+     * then continue straight on
      */
-    private void arcToWall() {
+    private void turnToWall() {
     	//fixme: magic numbers
         if (RobotSpecs.sonarPointsLeft) {
         	//arc left
@@ -175,7 +221,7 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 75;
 		long target = System.currentTimeMillis() + arcDurationMs;
-        while (System.currentTimeMillis() < target && !supressed) {
+        while (System.currentTimeMillis() < target && !isSupressed) {
         	Thread.yield();
         }
         
@@ -186,8 +232,7 @@ public class MuurvolgerBehavior implements Behavior {
 
 	/**
 	 * make a 90 degrees turn using an arc motion in the direction that the
-	 * sonar is pointed in and drive forward until the sonar again detects a
-	 * wall. 
+	 * sonar is pointed in and drive forward over the length of one tile.
 	 * 
 	 * this should be called if the sonar detects an open space, indicating 
 	 * that track is turning.
@@ -213,45 +258,24 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 800;
 		long timeTarget = System.currentTimeMillis() + arcDurationMs;
-        while (!supressed && System.currentTimeMillis() < timeTarget){
+        while (!isSupressed && System.currentTimeMillis() < timeTarget){
         	Thread.yield();
         }
         
-        //drive straight until there is again a wall detected
+        //drive straight for the length of a tile
         //but again break if action if suppressed
         motorLeft.setSpeed(900);
         motorRight.setSpeed(900);
-        while (newDistance > 80 && !supressed){
+        
+        long timeToTravelTileMs = RobotSpecs.timeToTravel(900, TrackSpecs.tileWidth);
+        timeTarget = System.currentTimeMillis() + timeToTravelTileMs;
+        while (!isSupressed && System.currentTimeMillis() < timeTarget){
         	Thread.yield();
         }
 
     }
 
-    /**
-     * action of this behavior.
-     * 
-     *  + if we are to close to the wall then the robot arcs away form it.
-     *  + if we are to far form the wall then the robat arcs towards it.
-     *  + if we detect an open space in the sonar direction then the robot turn towards it
-     *  and drives forward until it again detects a wall
-     *  
-     *  only return if suppressed or motion completed!
-     *  after which the robot drives straight again.
-     */
-    @Override
-    public void action() {
-    	this.isActionInProgress = true;
-        
-		if (isOpenSpaceDetected()) {		
-            turnToOpenSpace();
-        } else if (isWallToClose()) {
-            arcFromWall();
-        } else if (isWallToFar()) {
-            arcToWall();
-        }
-        
-		this.isActionInProgress = false;
-    }
+
 
     /**
      * return true if the measured distance is larger then the distance setpoint
@@ -274,7 +298,7 @@ public class MuurvolgerBehavior implements Behavior {
 	 * The threshold is used to filter out fluke distance measurements
 	 */
 	private boolean isOpenSpaceDetected() {
-		return Robot.openSpaceCounter > openSpaceCounterThreshold;
+		return openSpaceCounter > openSpaceCounterThreshold;
 	}
 
     /**
@@ -282,21 +306,23 @@ public class MuurvolgerBehavior implements Behavior {
      */
     @Override
     public void suppress() {
-        supressed = true;
+        isSupressed = true;
     }
-
-    /**
-     * used by the arbitrator to check if this behavior want to be active.
-     * which is the case if the robot is to far or to close to the wall
-     * or detects an open space in the direction of it sonar
-     */
-    @Override
-    public boolean takeControl() {
-        return 	!isActionInProgress && ( 
-        			(isWallToClose() && newDistance < prevDistance) ||
-        			(isWallToFar() && newDistance > prevDistance) ||
-        			isOpenSpaceDetected()
-        			);
-
-    }
+    
+    
+	/**
+	 * Robot is moving away from the wall the sonar is pointed to.
+	 * @return
+	 */
+	private boolean isGettingFurther() {
+		return newDistance > prevDistance;
+	}
+	
+	/**
+	 * Robot is moving towards from the wall the sonar is pointed to.
+	 * @return
+	 */
+	private boolean isGettingCloser() {
+		return newDistance < prevDistance;
+	}
 }

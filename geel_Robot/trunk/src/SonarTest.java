@@ -1,9 +1,10 @@
 import geel.RobotSpecs;
+import lejos.nxt.Button;
 import lejos.nxt.UltrasonicSensor;
 
 
 /**
- * print the sonar value on the screen
+ * repeatedly print the sonar value on the screen until the escape is pressed
  * 
  * @author jeroendv
  *
@@ -14,7 +15,8 @@ public class SonarTest {
 		
 		UltrasonicSensor sonar = new UltrasonicSensor(RobotSpecs.sonarSensorPort);
 		
-		while(true){
+		while(! Button.ESCAPE.isPressed()){
+			
 			int distance = sonar.getDistance();
 			System.out.println(distance);
 			

@@ -34,7 +34,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private static final long serialVersionUID = -2655975772061336677L;
 	
 	// sensor data
-	private final int MAX_HISTORY = 1000;
+	private final int MAX_HISTORY = 400;
 	private ArrayList<Integer> lightSensorValues = new ArrayList<Integer>();
 	private ArrayList<Integer> sonarSensorValues = new ArrayList<Integer>();
 	private boolean touchSensorPressed = false;

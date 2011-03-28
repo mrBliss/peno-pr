@@ -46,6 +46,7 @@ public class BTGateway {
 		setConnection(conn);
 	}
 	
+	
 	public BTGateway(DataInputStream input, DataOutputStream output) {
 		$identity = $identityCounter++;
 		$input = input;
@@ -57,17 +58,24 @@ public class BTGateway {
 				BTGWPacket p = null;
 				while(true) {
 					
-					while((p = popNextPacket()) != null) {
-						try {
-							p.transmit($output);
+					//when the queue is being transmitted no packets can be added
+					synchronized ($queue) {
+						try{
+							//transmit all packets in queue and flush
+							while((p = popNextPacket()) != null) {
+								p.transmit($output);
+							}	
 							$output.flush();
-						} catch (IOException e1) {
+						}catch (IOException e) {
 							BTGWConnection c = getConnection();
 							if(c != null) {
 								c.autoReconnect();
 							}
-						}
+						}				
 					}
+					
+					// provide opportunity for other threads to fill packet queue again
+					Thread.yield();
 				}
 			}
 		};
@@ -80,16 +88,19 @@ public class BTGateway {
 				int cmdtype = 0;
 				while(true) {
 					try {
+						// read packet command code
 						cmdtype = $input.readInt();
 						
 						if(cmdtype < BTGWPacket.CMD_AMOUNT) {
+							// create empty packet of that type
 							p = BTGWPacket.getPacketOfType(cmdtype);
 							if(p != null) {
+								// initialize packet with received data
 								p.receive($input);
 								//System.out.println("BTGateway["+$identity+"] received packet "+cmdtype);
 								notifyListeners(cmdtype, p);
 							} else {
-								// received packet with unknown command code
+								//todo received packet with unknown command code
 								// silently ignoring that for now...
 							}
 						}
@@ -109,17 +120,26 @@ public class BTGateway {
 		return $identity;
 	}
 	
-	private synchronized BTGWPacket popNextPacket() {
-		if($queue == null || $queue.size() < 1)
-			return null;
-		
-		BTGWPacket p = (BTGWPacket) $queue.remove(0);
-		
-		return p;
+	private BTGWPacket popNextPacket() {
+		synchronized($queue){
+			if($queue == null || $queue.size() < 1)
+				return null;
+			
+			BTGWPacket p = (BTGWPacket) $queue.remove(0);
+			
+			return p;
+		}
 	}
 	
-	public synchronized void sendPacket(BTGWPacket p) {
-		$queue.add(p);
+	/**
+	 * queue a packet for transmission by this BTGateway
+	 * 
+	 * @param p
+	 */
+	public void sendPacket(BTGWPacket p) {
+		synchronized ($queue) {
+			$queue.add(p);		
+		}
 	}
 	
 	private void notifyListeners(int cmdtype, BTGWPacket packet) {

@@ -41,6 +41,7 @@ public class BTGWPacket {
 	
 	private int $commandCode;
 	
+	/* Update this when adding a new command */
 	public static BTGWPacket getPacketOfType(int type) {
 		switch (type) {
 		case CMD_PING:

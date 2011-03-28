@@ -3,26 +3,24 @@
     	build robot codebase
     </description>
 	<!--=======================================================================-->
-	<!-- load external properties -->
-
-	<!-- load lejos libraries and standard dependencies -->
-	<property file="lejos.properties" />
+	<!-- load constants -->
+	<property file="constants.properties" />
 	<!--=======================================================================-->
-	
 	
 	
 
 	<!--=======================================================================-->
 	<!-- primary properties -->
+	
+	<!-- lejos home directory -->
+	<property name="nxj.home" value="${nxj.home.pclab}"/>
 
 	<!-- the main class of the program -->
 	<property name="mainClass" value="geel.WallTracker" />
 
 	<!-- adress of the NXT brick to upload to -->
-	<property name="nxt.address" value="${nxt.address.walle}" />
+	<property name="nxt.address" value="${nxt.address.rood}" />
 	<!--=======================================================================-->
-
-
 
 
 	<!--=======================================================================-->
@@ -32,9 +30,12 @@
 	<property name="src" location="./src" />
 	<property name="bin" location="./antbin" />
 
-	<!-- output file of linker -->
+	<!-- load lejos libraries and standard dependencies -->
+	<property file="lejos.properties" />
+
+	<!-- nxj-file produced by linker -->
 	<property name="program" value="${mainClass}"/>
-	<property name="binaryFile" value="${bin}/${program}.nxj" />
+	<property name="nxjFile" value="${bin}/${program}.nxj" />
 	<!--=======================================================================-->
 
 
@@ -66,7 +67,7 @@
 
 
 
-	<!-- Link ${mainClass} and create a signature file ${binaryFile} -->
+	<!-- Link ${mainClass} and create a signature file ${nxjFile} -->
 	<target name="link" depends="compile" description="link the binary">
 
 		<java classname="js.tinyvm.TinyVM">
@@ -78,7 +79,7 @@
 			<arg value="LE" />
 			<arg value="${mainClass}" />
 			<arg value="-o" />
-			<arg value="${binaryFile}" />
+			<arg value="${nxjFile}" />
 			<arg value="-v" />
 			<classpath>
 				<pathelement location="${nxj.jtools.jar}" />
@@ -104,22 +105,33 @@
 
 
 	<target name="Open nxjconsole">
-		<exec executable="nxjconsole">
+		<java classname="lejos.pc.tools.Console" fork="true">
+			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
+			<jvmarg value="-Dnxj.home=${nxj.home}" />
 			<arg value="-b" />
 			<arg value="-d" />
 			<arg value="${nxt.address}" />
-		</exec>
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.pctools.jar}" />
+				<pathelement location="${nxj.pccomm.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+				<pathelement location="${nxj.bluecove.jar}" />
+				<pathelement location="${nxj.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
 	</target>
 
 
 
-	<!-- upload ${binaryFile} to NXT -->
-	<target name="upload" depends="link,BT scan" description="upload the binaryFile">
+	<!-- upload ${nxjFile} to NXT -->
+	<target name="upload" depends="link,BT scan" description="upload the nxjFile">
 
 		<java classname="lejos.pc.tools.NXJUpload" fork="true">
 			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
 			<jvmarg value="-Dnxj.home=${nxj.home}" />
-			<arg value="${binaryFile}" />
+			<arg value="${nxjFile}" />
 			<arg value="-b" />
 			<arg value="-d" />
 			<arg value="${nxt.address}" />
@@ -138,13 +150,13 @@
 
 
 
-	<!-- upload ${binaryFile} to NXT and run it -->
-	<target name="uploadandrun" depends="link,BT scan" description="upload and run the binaryFile">
+	<!-- upload ${nxjFile} to NXT and run it -->
+	<target name="uploadandrun" depends="link,BT scan" description="upload and run the nxjFile">
 
 		<java classname="lejos.pc.tools.NXJUpload" fork="true">
 			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
 			<jvmarg value="-Dnxj.home=${nxj.home}" />
-			<arg value="${binaryFile}" />
+			<arg value="${nxjFile}" />
 			<arg value="-r" />
 			<arg value="-b" />
 			<arg value="-d" />

@@ -3,10 +3,8 @@
     	build robot codebase
     </description>
 	<!--=======================================================================-->
-	<!-- load external properties -->
-
-	<!-- load lejos libraries and standard dependencies -->
-	<property file="lejos.properties" />
+	<!-- load constants -->
+	<property file="constants.properties" />
 	<!--=======================================================================-->
 	
 	
@@ -14,6 +12,9 @@
 
 	<!--=======================================================================-->
 	<!-- primary properties -->
+	
+	<!-- lejos home directory -->		
+	<property name="nxj.home" value="${nxj.home.zadeh}"/>
 
 	<!-- the main class of the program -->
 	<property name="mainClass" value="geel.WallTracker" />
@@ -27,6 +28,9 @@
 
 	<!--=======================================================================-->
 	<!-- derived properties -->
+	
+	<!-- load lejos libraries and standard dependencies -->
+	<property file="lejos.properties" />
 	
 	<!-- seperated src and bin directories -->
 	<property name="src" location="./src" />

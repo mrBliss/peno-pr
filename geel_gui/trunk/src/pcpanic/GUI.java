@@ -10,6 +10,9 @@
  */
 package pcpanic;
 
+import geel.BTGW.infrastructure.*;
+import geel.BTGW.packets.*;
+
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -621,6 +624,8 @@ public class GUI extends javax.swing.JFrame {
             case java.awt.event.KeyEvent.VK_SPACE:
                 p.fullStop(); // stop
                 p.apply();
+                System.out.println("Sending PING...");
+                BTGateway.getInstance().sendPacket(new BTGWPacketPing());
                 break;
             case java.awt.event.KeyEvent.VK_BACK_SPACE: // reverse
                 p.multL(-1);

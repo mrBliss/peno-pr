@@ -65,7 +65,7 @@ public class Robot {
     // statische variabele voor de gelezen code uit te voeren.
     // deze mogen niet private zijn, worden aangepast in barcodebehavior.
     // Variabele voor de snelheid van de robot
-    private static int speed = 900;
+    private static int speed = 200;
 
     
 

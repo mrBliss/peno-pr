@@ -2,6 +2,9 @@ package geel;
 
 import java.io.PrintStream;
 
+import geel.BTGW.packets.*;
+import geel.BTGW.robot.*;
+import geel.BTGW.infrastructure.*;
 import geel.behaviours.MuurvolgerBehavior;
 import lejos.nxt.Button;
 import lejos.nxt.UltrasonicSensor;
@@ -9,7 +12,7 @@ import lejos.nxt.comm.RConsole;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
-public class WallTracker {
+public class WallTracker implements IBTGWCommandListener {
 	/*
 	 * references to robot sensory input classes
 	 */
@@ -34,10 +37,22 @@ public class WallTracker {
     	
     	//wait for remote console to connect
     	int timeout = 0;
-		RConsole.openBluetooth(timeout);
-		System.setOut(new PrintStream(RConsole.openOutputStream()));
-    	    	
+		//RConsole.openBluetooth(timeout);
+		//System.setOut(new PrintStream(RConsole.openOutputStream()));
+    	  
+    	BTGWRealConnectionTaker btconn = new BTGWRealConnectionTaker();
+    	System.out.println("Waiting for BT...");
+        btconn.connect();
         
+        while(btconn.getStatus() != BTGWConnection.STATUS_CONNECTED) {
+            try {
+                    Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+        
+        BTGateway.addInstance(new BTGateway(btconn));
+
         /* instantiate an array of behaviors that will control the robot
          * from lowest to highest  behavior priority
          */
@@ -45,9 +60,13 @@ public class WallTracker {
         	new MuurvolgerBehavior(sonar, speed, motorRight, motorLeft),
         };
         
+        // Listen for pings
+        BTGateway.getInstance().addListener(BTGWPacket.CMD_PING, new WallTracker());
+        
         
         /* instantiate an arbitrator */
         System.out.println("program starting");
+        
         (new Arbitrator(bArray)).start();
     }
 
@@ -57,6 +76,15 @@ public class WallTracker {
      */
 	private static void calibrateSonar() {
 		sonar.reset();
+	}
+
+	public void handlePacket(BTGWPacket packet) {
+		if(packet.getCommandCode() == BTGWPacket.CMD_PING) {
+			System.out.println("PING? PONG!");
+			BTGateway.getInstance().sendPacket(new BTGWPacketPong());
+			//System.exit(0);
+		}
+		
 	}
     
    

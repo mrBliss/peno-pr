@@ -1,5 +1,9 @@
 package pcpanic.NXT;
 
+import geel.BTGW.infrastructure.*;
+import geel.BTGW.packets.*;
+import geel.BTGW.pc.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +19,7 @@ import lejos.pc.comm.NXTInfo;
  *
  * @author Me
  */
-public class Pilot {
+public class Pilot implements IBTGWCommandListener {
 
     private JSlider sliderL;
     private JSlider sliderR;
@@ -82,59 +86,95 @@ public class Pilot {
     }
 
     public final void connect() throws Exception {
-    	open = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
-    	//open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "WallE", "00:16:53:02:F7:9D"));
-    	open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "ROOD", "00:16:53:06:23:A0"));
-        outputStream = open.getOutputStream();
-        inputStream = open.getInputStream();
+//    	open = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
+//    	//open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "WallE", "00:16:53:02:F7:9D"));
+//    	open.open(new NXTInfo(NXTCommFactory.BLUETOOTH, "ROOD", "00:16:53:06:23:A0"));
+//        outputStream = open.getOutputStream();
+//        inputStream = open.getInputStream();
+        
+        BTGWConnection btgwconn = new BTGWRealConnectionMaker("ROOD", "00:16:53:06:23:A0");
+
+        /* connect to it */
+        btgwconn.connect();
+        /* wait untill we are connected */
+        while(btgwconn.getStatus() != BTGWConnection.STATUS_CONNECTED) {
+                //System.out.println("Not connected. Sleeping...");
+                try {
+                        Thread.sleep(200);
+                } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                }
+
+        }
+
+        System.out.println("connected");
+        /* create a gateway */
+        BTGateway btgw = new BTGateway(btgwconn);
+        BTGateway.addInstance(btgw);
+        
+        BTGateway.getInstance().addOmniListener(this);
     }
 
     public void close() {
-        try {
-            open.close();
-        } catch (IOException ex) {
+    	if(BTGateway.getInstance() != null) {
+        	BTGateway.getInstance().getConnection().disconnect();
         }
+    	
+//        try {
+//            open.close();
+//            
+//        } catch (IOException ex) {
+//        }
     }
 
     public void send(byte n) {
-        System.out.println("e: " + n);
-        try {
-            outputStream.write(n);
-            outputStream.flush();
-        } catch (IOException ex) {
-        }
+//        System.out.println("e: " + n);
+//        try {
+//            outputStream.write(n);
+//            outputStream.flush();
+//        } catch (IOException ex) {
+//        }
     }
 
     public void send(byte i, byte j, byte k) {
-        System.out.println("m: " + i + " " + j + " " + k);
-        
-        try {
-            outputStream.write(i);
-            outputStream.write(j);
-            outputStream.write(k);
-            outputStream.flush();
-        } catch (IOException ex) {
-        }
-        
+//        System.out.println("m: " + i + " " + j + " " + k);
+//        
+//        try {
+//            outputStream.write(i);
+//            outputStream.write(j);
+//            outputStream.write(k);
+//            outputStream.flush();
+//        } catch (IOException ex) {
+//        }
+//        
     }
 
     public void startRem() {
-        send((byte) 10);
+        //send((byte) 10);
     }
 
     public void stopRem() {
-        send((byte) 11);
+        //send((byte) 11);
     }
 
     public void globalSpeed(byte i) {
-        send((byte) 20, (byte) (100 + i), (byte) (100 + i));
+        //send((byte) 20, (byte) (100 + i), (byte) (100 + i));
     }
 
     public void toeter(int i) {
-        send((byte) (30 + i));
+        //send((byte) (30 + i));
     }
 
     public void send(int i, int lSpeed, int rSpeed) {
-        send((byte) i, (byte) lSpeed, (byte) rSpeed);
+        //send((byte) i, (byte) lSpeed, (byte) rSpeed);
     }
+
+	@Override
+	public void handlePacket(BTGWPacket packet) {
+		// TODO Auto-generated method stub
+		if(packet.getCommandCode() == BTGWPacket.CMD_PONG) {
+			System.out.println("Received PONG");
+		}
+	}
 }

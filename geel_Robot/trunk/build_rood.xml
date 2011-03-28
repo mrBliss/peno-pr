@@ -16,7 +16,7 @@
 	<!-- primary properties -->
 
 	<!-- the main class of the program -->
-	<property name="mainClass" value="geel.Robot" />
+	<property name="mainClass" value="geel.WallTracker" />
 
 	<!-- adress of the NXT brick to upload to -->
 	<property name="nxt.address" value="${nxt.address.rood}" />
@@ -102,15 +102,25 @@
 		</exec>
 	</target>
 
-
 	<target name="Open nxjconsole">
-		<exec executable="nxjconsole">
+
+		<java classname="lejos.pc.tools.Console" fork="true">
+			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
+			<jvmarg value="-Dnxj.home=${nxj.home}" />
 			<arg value="-b" />
 			<arg value="-d" />
 			<arg value="${nxt.address}" />
-		</exec>
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.pctools.jar}" />
+				<pathelement location="${nxj.pccomm.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+				<pathelement location="${nxj.bluecove.jar}" />
+				<pathelement location="${nxj.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
 	</target>
-
 
 
 	<!-- upload ${binaryFile} to NXT -->

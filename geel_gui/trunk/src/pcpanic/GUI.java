@@ -12,6 +12,8 @@ package pcpanic;
 
 import geel.BTGW.infrastructure.*;
 import geel.BTGW.packets.*;
+import geel.GUI.GUISensorPanel;
+import geel.GUI.GUIStandAloneFrame;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -24,6 +26,9 @@ import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.JFrame;
+
 import lejos.pc.comm.NXTComm;
 import lejos.pc.comm.NXTCommandConnector;
 import pcpanic.NXT.Pilot;
@@ -47,8 +52,8 @@ public class GUI extends javax.swing.JFrame {
     /** Creates new form TGUI */
     public GUI() {
         initComponents();
-        chkOutActionPerformed(null);
-        chkErrActionPerformed(null);
+        //chkOutActionPerformed(null);
+        //chkErrActionPerformed(null);
         chkServActionPerformed(null);
     }
 
@@ -426,7 +431,7 @@ public class GUI extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Server", panServ);
 
-        chkOut.setSelected(true);
+        chkOut.setSelected(false);
         chkOut.setText("System Out");
         chkOut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -434,7 +439,7 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        chkErr.setSelected(true);
+        chkErr.setSelected(false);
         chkErr.setText("System Err");
         chkErr.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -442,7 +447,7 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        chkServ.setSelected(true);
+        chkServ.setSelected(false);
         chkServ.setText("Server");
         chkServ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -837,6 +842,8 @@ public class GUI extends javax.swing.JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
+                
+                new GUIStandAloneFrame(new GUISensorPanel(), "Test");
             }
         });
     }

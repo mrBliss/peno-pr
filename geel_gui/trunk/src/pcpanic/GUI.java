@@ -10,30 +10,18 @@
  */
 package pcpanic;
 
-import geel.BTGW.infrastructure.*;
-import geel.BTGW.packets.*;
-import geel.GUI.GUISensorPanel;
-import geel.GUI.GUIStandAloneFrame;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.packets.BTGWPacketPing;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EmptyStackException;
-import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import javax.swing.JFrame;
-
-import lejos.pc.comm.NXTComm;
-import lejos.pc.comm.NXTCommandConnector;
 import pcpanic.NXT.Pilot;
-
-
 import pcpanic.Server.Server;
 
 /**

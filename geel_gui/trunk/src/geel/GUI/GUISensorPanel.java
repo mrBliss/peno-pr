@@ -71,24 +71,27 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	    touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
 	    touchSensorNotPressedImage = Toolkit.getDefaultToolkit().getImage("images/nocollision.png");
 	        
-		Thread t = new Thread() {
-			public void run() {
-				while(true) {
-					sonarTick+=sonarSpeed;
-					
-					double someval = Math.abs(Math.sin(sonarTick / 100.0) * 100.0);
-					addSensorData((int)someval, (int)someval, (sonarTick % 100 > 50));
-					
-					try {
-						sleep(10);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		t.start();
+//		Thread t = new Thread() {
+//			public void run() {
+//				while(true) {
+//					sonarTick+=sonarSpeed;
+//					
+//					double someval = Math.abs(Math.sin(sonarTick / 100.0) * 100.0);
+//					addSensorData((int)someval, (int)someval, (sonarTick % 100 > 50));
+//					
+//					try {
+//						sleep(10);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		};
+//		t.start();
+	    
+	    if(BTGateway.getInstance() != null)
+	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_STATUSUPDATE, this);
 	}
 
 	@Override
@@ -210,6 +213,10 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 
 	@Override
 	public void handlePacket(BTGWPacket packet) {
+		if(packet.getCommandCode() == BTGWPacket.CMD_STATUSUPDATE) {
+			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
+			addSensorData(p.getLightSensorValue(), p.getSonarSensorValue(), p.getTouchSensorValue());
+		}
 	}
 	
 	private void addSensorData(int _lightSensorValue, int _sonarSensorValue, boolean _touchSensorPressed) {		

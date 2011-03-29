@@ -842,8 +842,6 @@ public class GUI extends javax.swing.JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
-                
-                new GUIStandAloneFrame(new GUISensorPanel(), "Test");
             }
         });
     }

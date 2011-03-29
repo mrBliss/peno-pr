@@ -3,6 +3,8 @@ package pcpanic.NXT;
 import geel.BTGW.infrastructure.*;
 import geel.BTGW.packets.*;
 import geel.BTGW.pc.*;
+import geel.GUI.GUISensorPanel;
+import geel.GUI.GUIStandAloneFrame;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,6 +116,8 @@ public class Pilot implements IBTGWCommandListener {
         BTGateway.addInstance(btgw);
         
         BTGateway.getInstance().addOmniListener(this);
+        
+        new GUIStandAloneFrame(new GUISensorPanel(), "Robot sensor data");
     }
 
     public void close() {

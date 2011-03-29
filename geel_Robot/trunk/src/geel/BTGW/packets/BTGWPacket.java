@@ -35,9 +35,10 @@ public class BTGWPacket {
 	public static final int CMD_PONG = 1;
 	public static final int CMD_MESSAGE = 2;
 	public static final int CMD_DIE = 3;
+	public static final int CMD_STATUSUPDATE = 4;
 	
 	/* Update this when adding a new command */
-	public static final int CMD_AMOUNT = 4;
+	public static final int CMD_AMOUNT = 5;
 	
 	private int $commandCode;
 	
@@ -52,6 +53,8 @@ public class BTGWPacket {
 			return new BTGWPacketMessage();
 		case CMD_DIE:
 			return new BTGWPacketDie();
+		case CMD_STATUSUPDATE:
+			return new BTGWPacketStatusUpdate();
 		default:
 			return null;
 		}

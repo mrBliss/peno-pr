@@ -75,7 +75,7 @@ public class WallTracker implements IBTGWCommandListener {
         Thread dataLogger = new Thread() {
         	public void run() {
         		while(true) {
-	        		int _sonar = WallTracker.sonar.capture();
+	        		int _sonar = WallTracker.sonar.getDistance();
 	        		int _light = WallTracker.light.getLightValue();
 	        		boolean _touch = WallTracker.touch.isPressed();
 	        		

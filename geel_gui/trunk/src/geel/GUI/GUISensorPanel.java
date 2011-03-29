@@ -15,8 +15,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-
-import com.sun.xml.internal.bind.v2.util.CollisionCheckStack;
 /**
  * The GUISensorPanel will draw a visual representation of all the sensors
  *   - it will show if the touch sensor is pressed

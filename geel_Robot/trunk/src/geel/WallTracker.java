@@ -7,6 +7,8 @@ import geel.BTGW.robot.*;
 import geel.BTGW.infrastructure.*;
 import geel.behaviours.MuurvolgerBehavior;
 import lejos.nxt.Button;
+import lejos.nxt.LightSensor;
+import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.nxt.comm.RConsole;
 import lejos.robotics.subsumption.Arbitrator;
@@ -17,6 +19,9 @@ public class WallTracker implements IBTGWCommandListener {
 	 * references to robot sensory input classes
 	 */
 	private static UltrasonicSensor sonar = new UltrasonicSensor(RobotSpecs.sonarSensorPort);
+	private static LightSensor light = new LightSensor(RobotSpecs.lightSensorPort, true);
+	private static TouchSensor touch = new TouchSensor(RobotSpecs.touchSensorFrontPort);
+	
 	
 	/*
 	 * references to robot left and right motor classes
@@ -66,6 +71,25 @@ public class WallTracker implements IBTGWCommandListener {
         
         /* instantiate an arbitrator */
         System.out.println("program starting");
+        
+        Thread dataLogger = new Thread() {
+        	public void run() {
+        		while(true) {
+	        		int _sonar = WallTracker.sonar.capture();
+	        		int _light = WallTracker.light.getLightValue();
+	        		boolean _touch = WallTracker.touch.isPressed();
+	        		
+	        		BTGateway.getInstance().sendPacket(new BTGWPacketStatusUpdate(_light, _sonar, _touch));
+	        		try {
+						sleep(50);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
+					}
+        		}
+        	}
+        };
+        dataLogger.start();
         
         (new Arbitrator(bArray)).start();
     }

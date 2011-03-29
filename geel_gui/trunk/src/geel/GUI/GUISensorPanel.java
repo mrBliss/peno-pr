@@ -225,6 +225,8 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		lightSensorValues.add(0, new Integer(_lightSensorValue));
 		sonarSensorValues.add(0, new Integer(_sonarSensorValue));
 		
+		System.out.println("Added LS="+_lightSensorValue+" SS="+_sonarSensorValue+" TS="+_touchSensorPressed);
+		
 		// cap at max length
 		for(int i = lightSensorValues.size() - 1; i >= MAX_HISTORY; i--) lightSensorValues.remove(i);
 		for(int i = sonarSensorValues.size() - 1; i >= MAX_HISTORY; i--) sonarSensorValues.remove(i);

@@ -6,8 +6,6 @@ import geel.BTGW.infrastructure.*;
 import geel.behaviours.MuurvolgerBehavior;
 import lejos.nxt.LightSensor;
 import lejos.nxt.TouchSensor;
-import lejos.nxt.LightSensor;
-import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
@@ -64,8 +62,9 @@ public class WallTracker {
 		 * instantiate an array of behaviors that will control the robot from
 		 * lowest to highest behavior priority
 		 */
-		Behavior[] bArray = new Behavior[] { new MuurvolgerBehavior(sonar,
-				speed, motorRight, motorLeft), };
+		Behavior[] bArray = new Behavior[] {
+				new MuurvolgerBehavior(sonar,speed, motorRight, motorLeft),
+			};
 
 		/* instantiate an arbitrator */
 		System.out.println("program starting");
@@ -74,8 +73,9 @@ public class WallTracker {
 	}
 
 	/*
-	 * when receiving a ping command: 1) print 'ping pong' to sysout 2) reply
-	 * with a pong command
+	 * when receiving a ping command: 
+	 *  1) print 'ping pong' to sysout 
+	 *  2) reply with a pong command
 	 * 
 	 * (non-Javadoc)
 	 * 
@@ -91,6 +91,7 @@ public class WallTracker {
 					public void handlePacket(BTGWPacket packet) {
 						if (packet.getCommandCode() == BTGWPacket.CMD_PING) {
 							System.out.println("PING? PONG!");
+							
 							BTGateway.getInstance().sendPacket(
 									new BTGWPacketPong());
 						}

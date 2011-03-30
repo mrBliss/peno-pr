@@ -35,18 +35,11 @@ public class BTGWPacketMessage extends BTGWPacket {
 	public void transmit(DataOutputStream output) throws IOException {
 		super.transmit(output);
 		
-		output.writeInt(getMessage().length());
-		output.writeChars(getMessage());
+		writeString(output, getMessage());
 	}
 	
 	public void receive(DataInputStream input) throws IOException {
 		super.receive(input);
-		
-		int len = input.readInt();
-		char m[] = new char[len];
-		for(int i = 0; i < len; i++) {
-			m[i] = input.readChar();
-		}
-		setMessage(new String(m));
+		setMessage(readString(input));
 	}
 }

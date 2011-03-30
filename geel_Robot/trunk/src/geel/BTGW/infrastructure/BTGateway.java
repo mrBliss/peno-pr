@@ -41,69 +41,16 @@ public class BTGateway {
 	
 	private int $identity;
 	
-	public BTGateway(BTGWConnection conn) {
-		this(conn.getInputStream(), conn.getOutputStream());
-		setConnection(conn);
-	}
-	
-	
-	public BTGateway(DataInputStream input, DataOutputStream output) {
-		$identity = $identityCounter++;
-		$input = input;
-		$output = output;
-		
-		// send packets from the queue
-		Thread sendThread = new Thread() {
-			public void run() {
-				BTGWPacket p = null;
-				while(true) {
-					
-					//when the queue is being transmitted no packets can be added
-					synchronized ($queue) {
-						try{
-							//transmit all packets in queue and flush
-							while((p = popNextPacket()) != null) {
-								p.transmit($output);
-							}	
-							$output.flush();
-						}catch (IOException e) {
-							BTGWConnection c = getConnection();
-							if(c != null) {
-								c.autoReconnect();
-							}
-						}				
-					}
-					
-					// provide opportunity for other threads to fill packet queue again
-					Thread.yield();
-				}
-			}
-		};
-		sendThread.start();
-		
-		// receive thread
-		Thread recvThread = new Thread() {
-			public void run() {
-				BTGWPacket p = null;
-				int cmdtype = 0;
-				while(true) {
+	private Thread sendThread = new Thread() {
+		public void run() {
+			System.out.println("SendThead: started");
+			BTGWPacket p = null;
+			while( !closeBTGW ) {
+				//transmit all packets in queue and flush
+				while((p = popNextPacket()) != null) {
 					try {
-						// read packet command code
-						cmdtype = $input.readInt();
-						
-						if(cmdtype < BTGWPacket.CMD_AMOUNT) {
-							// create empty packet of that type
-							p = BTGWPacket.getPacketOfType(cmdtype);
-							if(p != null) {
-								// initialize packet with received data
-								p.receive($input);
-								//System.out.println("BTGateway["+$identity+"] received packet "+cmdtype);
-								notifyListeners(cmdtype, p);
-							} else {
-								//todo received packet with unknown command code
-								// silently ignoring that for now...
-							}
-						}
+						p.transmit($output);
+						$output.flush();
 					} catch (IOException e) {
 						BTGWConnection c = getConnection();
 						if(c != null) {
@@ -111,8 +58,69 @@ public class BTGateway {
 						}
 					}
 				}
+				
+				// provide opportunity for other threads to fill packet queue again
+				Thread.yield();
 			}
-		};
+			System.out.println("SendThead: stopped");
+		}
+	};
+	private Thread recvThread = new Thread() {
+		public void run() {
+			//fixme: receive thread should terminate when closebTGW is true!
+			// now it just blocks on $input.readInt();
+			System.out.println("ReceiveThread: started");
+			BTGWPacket p = null;
+			int cmdtype = 0;
+			while( !closeBTGW ) {
+				try {
+					// read packet command code
+					cmdtype = $input.readInt();
+					
+					if(cmdtype < BTGWPacket.CMD_AMOUNT) {
+						// create empty packet of that type
+						p = BTGWPacket.getPacketOfType(cmdtype);
+						if(p != null) {
+							// initialize packet with received data
+							p.receive($input);
+							//System.out.println("BTGateway["+$identity+"] received packet "+cmdtype);
+							notifyListeners(cmdtype, p);
+						} else {
+							//todo received packet with unknown command code
+							// silently ignoring that for now...
+						}
+					}
+				} catch (IOException e) {
+					System.out.println("ReceiveThread: exception caught");
+					BTGWConnection c = getConnection();
+					if(c != null) {
+						c.autoReconnect();
+					}
+				}
+			}
+			
+			System.out.println("ReceiveThread: stopped");
+		}
+	};
+	
+	// set by close() to indicate that BTGW should be closed
+	// used by the send and receive thread
+	private boolean closeBTGW = false;
+	
+	public BTGateway(BTGWConnection conn) {
+		this(conn.getInputStream(), conn.getOutputStream());
+		setConnection(conn);
+	}
+	
+	
+	
+	public BTGateway(DataInputStream input, DataOutputStream output) {
+		$identity = $identityCounter++;
+		$input = input;
+		$output = output;
+		
+		
+		sendThread.start();
 		recvThread.start();
 	}
 	
@@ -120,26 +128,17 @@ public class BTGateway {
 		return $identity;
 	}
 	
-	private BTGWPacket popNextPacket() {
-		synchronized($queue){
-			if($queue == null || $queue.size() < 1)
-				return null;
-			
-			BTGWPacket p = (BTGWPacket) $queue.remove(0);
-			
-			return p;
-		}
+	private synchronized BTGWPacket popNextPacket() {
+		if($queue == null || $queue.size() < 1)
+			return null;
+		
+		BTGWPacket p = (BTGWPacket) $queue.remove(0);
+		
+		return p;
 	}
 	
-	/**
-	 * queue a packet for transmission by this BTGateway
-	 * 
-	 * @param p
-	 */
-	public void sendPacket(BTGWPacket p) {
-		synchronized ($queue) {
-			$queue.add(p);		
-		}
+	public synchronized void sendPacket(BTGWPacket p) {
+		$queue.add(p);
 	}
 	
 	private void notifyListeners(int cmdtype, BTGWPacket packet) {
@@ -204,5 +203,29 @@ public class BTGateway {
 
 	private void setConnection(BTGWConnection connection) {
 		this.connection = connection;
+	}
+
+	/**
+	 * cleanly close the Bluetooth gateway.
+	 * by stopping the send and receive thread and closing the data streams
+	 * 
+	 * @throws IOException
+	 */
+	public void close() throws IOException {
+		System.out.println("BTGateWay: indicating Send and Receive thread to stop");
+		this.closeBTGW = true;
+		
+
+		
+		// wait for send and receive thread to close
+		while(sendThread.isAlive() || recvThread.isAlive()){
+			Thread.yield();
+		}
+		
+		// close data streams
+		this.$input.close();
+		this.$output.close();
+		
+		System.out.println("BTGateWay: stopped");
 	}
 }

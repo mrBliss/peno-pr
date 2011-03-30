@@ -11,9 +11,7 @@ import lejos.robotics.subsumption.Behavior;
  * Behavior that will steer the robot based on the sonar input in order to 
  * keep a constant distance to the wall.
  * 
- * Given a sonar setpoint this behaviour will steer towards the wall if the sonar distance measure
- * is greater then the setpoint and steer away from the wall if the sonar distance measure is
- * smaller then the setpoint.
+ * see takeControl() and action()
  * 
  * @author team geel
  * 
@@ -27,10 +25,27 @@ public class MuurvolgerBehavior implements Behavior {
     //number of times an open space must be repeatedly detected for it not to be a fluke
     private static int openSpaceCounterThreshold = 3;
     
+    
+    /* 
+     * flag indicating the action to be performed by this behavior
+     * it is set by takeControl() and used by action().
+     * 
+     * note that action can only called by the arbitrator if takeControl(..) returns true, 
+     * at which point it also sets this flag 
+     */
+    private int action = noAction;
+    
+    //list of possible action values;
+    private static final int noAction = -1;
+    private static final int turnFromWallAction= 0;
+    private static final int turnToWallAction= 1;
+    private static final int openSpaceAction= 2;
+    
 	/*
 	 * count the number of times that the sonar repeatedly detects a open space.
-	 * (ie. distance > tileWidth)
-	 * reset to zero if a wall is detected
+	 * reset otherwise.
+	 * 
+	 * see updateOpenSpaceCounter()
 	 */
 	private int openSpaceCounter = 0;
     
@@ -66,7 +81,9 @@ public class MuurvolgerBehavior implements Behavior {
     	
     	/**
     	 * Count the number of times we repeatedly see an open space in the 
-    	 * direction of the sonar. The count is reset once if a wall is detected.
+    	 * direction of the sonar. 
+    	 * (ie. distance > tileWidth)
+    	 * The count is reset once if a wall is detected.
     	 */
     	private void updateOpenSpaceCounter() {
     		// if the sonar value if larger then the tile width then there is an open space
@@ -78,12 +95,11 @@ public class MuurvolgerBehavior implements Behavior {
     	}
     });
     
-    // boolean indication that this behaviour is busy performing an action
-    // prevening this behaviour to be preemted by itself through the arbitrator.
-    private boolean isActionInProgress = false;
-    
-    // boolean indicating if the behavior is being suppressed
-    private boolean isSupressed = false;
+    /* 
+     * set by suppress() called by the arbitrator
+     * to indicate that action() should be suppressed
+     */
+    private boolean suppressAction = false;
     
     
     // references to the sonar sensor and robot motors  needed by this behaviour
@@ -108,9 +124,6 @@ public class MuurvolgerBehavior implements Behavior {
         this.motorLeft = motorLeft;
         this.motorRight = motorRight;
         
-        // behaviour is not performing actions after its created
-        this.isActionInProgress = false;
-        
         //initialize the sonar old and new sample value to the setpoint
         prevDistance = sonarSetPoint;
         newDistance = sonarSetPoint;
@@ -125,10 +138,21 @@ public class MuurvolgerBehavior implements Behavior {
      */
     @Override
     public boolean takeControl() {
-    	
-        return 	(isWallToClose() && isGettingCloser()) ||
-        		(isWallToFar() && isGettingFurther()) ||
-        		isOpenSpaceDetected();
+    	// check if this behavior needs to take action
+    	// and set the appropriate action flag
+    	if (isWallToClose() && isGettingCloser() ){
+    		this.action = turnFromWallAction; 
+    		return true;
+    	} else if( isWallToFar() && isGettingFurther() ){
+    		this.action = turnToWallAction; 
+    		return true;
+    	} else if( isOpenSpaceDetected() ){
+    		this.action = openSpaceAction;
+    		return true;
+    	}else{
+    		this.action = noAction;
+    		return false;
+    	}
     }
     
 	private long oldTiming = 0;
@@ -136,56 +160,51 @@ public class MuurvolgerBehavior implements Behavior {
     
     /**
      * action of this behavior.
-     * 
-     *  + if we are to close to the wall then the robot turns away form it.
-     *  + if we are to far form the wall then the robot turns towards it.
-     *  + if we detect an open space in the sonar direction then the robot rotates towards it
-     *  and drives forward over the length of one tile
      *  
-     *  returns if suppressed or motion completed!
-     *  after which the robot drives straight again.
+     * returns if suppressed or motion completed,
+     * after which the robot drives straight again.
      */
     @Override
     public void action() {
-    	this.isActionInProgress = true;
     	
-    	//reset suppressed flag
-    	this.isSupressed = false;
+    	//reset suppress flag
+    	this.suppressAction = false;
         
-		if (isOpenSpaceDetected()) {
+		if( this.action == openSpaceAction ) {
 			oldTiming = newTiming;
 			newTiming = System.currentTimeMillis();
-			System.out.println("A: turn to sonar "+ (newTiming -oldTiming));
+//			System.out.println("A: turn to sonar "+ (newTiming -oldTiming));
 			
             turnToOpenSpace();
             
 			oldTiming = newTiming;
 			newTiming = System.currentTimeMillis();
-			System.out.println("AE: turn to sonar "+ (newTiming -oldTiming));
+//			System.out.println("AE: turn to sonar "+ (newTiming -oldTiming));
         } 
-		else if (isWallToClose()) {
+		else if( this.action == turnFromWallAction ) {
 			oldTiming = newTiming;
 			newTiming = System.currentTimeMillis();
-			System.out.println("A: turn from wall "+ (newTiming -oldTiming));
+//			System.out.println("A: turn from wall "+ (newTiming -oldTiming));
 			
             turnFromWall();
             
             oldTiming = newTiming;
             newTiming = System.currentTimeMillis();
-            System.out.println("AE: turn from wall " + (newTiming -oldTiming) );
-        } else if (isWallToFar()) {
+//            System.out.println("AE: turn from wall " + (newTiming -oldTiming) );
+        } else if( this.action == turnToWallAction ) {
 			oldTiming = newTiming;
 			newTiming = System.currentTimeMillis();
-			System.out.println("A: turn to wall "+ (newTiming -oldTiming));
+//			System.out.println("A: turn to wall "+ (newTiming -oldTiming));
 			
             turnToWall();
             
 			oldTiming = newTiming;
 			newTiming = System.currentTimeMillis();
-			System.out.println("AE: turn to wall "+ (newTiming -oldTiming));
+//			System.out.println("AE: turn to wall "+ (newTiming -oldTiming));
+        }else{
+        	System.out.println("bug: this should never happen");
         }
         
-		this.isActionInProgress = false;
     }
 
     /**
@@ -212,7 +231,7 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 50;
 		long target = System.currentTimeMillis() + arcDurationMs;
-        while (System.currentTimeMillis() < target && !isSupressed) {
+        while (!suppressAction && System.currentTimeMillis() < target) {
             Thread.yield();
         }
         
@@ -245,7 +264,7 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 75;
 		long target = System.currentTimeMillis() + arcDurationMs;
-        while (System.currentTimeMillis() < target && !isSupressed) {
+        while ( !suppressAction && System.currentTimeMillis() < target ) {
         	Thread.yield();
         }
         
@@ -282,7 +301,7 @@ public class MuurvolgerBehavior implements Behavior {
         //but break if action if suppressed
         int arcDurationMs = 800;
 		long timeTarget = System.currentTimeMillis() + arcDurationMs;
-        while (!isSupressed && System.currentTimeMillis() < timeTarget){
+        while (!suppressAction && System.currentTimeMillis() < timeTarget){
         	Thread.yield();
         }
         
@@ -293,7 +312,7 @@ public class MuurvolgerBehavior implements Behavior {
         
         long timeToTravelTileMs = RobotSpecs.timeToTravel(900, TrackSpecs.tileWidth);
         timeTarget = System.currentTimeMillis() + timeToTravelTileMs;
-        while (!isSupressed && System.currentTimeMillis() < timeTarget){
+        while (!suppressAction && System.currentTimeMillis() < timeTarget){
         	Thread.yield();
         }
 
@@ -322,8 +341,8 @@ public class MuurvolgerBehavior implements Behavior {
 	 * The threshold is used to filter out fluke distance measurements
 	 */
 	private boolean isOpenSpaceDetected() {
-		//return openSpaceCounter > openSpaceCounterThreshold;
-		return false;
+		//fixme: put this is seperate bahaviour?
+		return openSpaceCounter > openSpaceCounterThreshold;
 	}
 
     /**
@@ -331,12 +350,14 @@ public class MuurvolgerBehavior implements Behavior {
      */
     @Override
     public void suppress() {
-        isSupressed = true;
+        this.suppressAction = true;
     }
     
     
 	/**
-	 * Robot is moving away from the wall the sonar is pointed to.
+	 * check  if robot is moving away from the wall the sonar is pointed to
+	 * based on the current and previous distance sample
+	 * (note that there is a certain amount of noise of distance measurement)
 	 * @return
 	 */
 	private boolean isGettingFurther() {
@@ -344,7 +365,9 @@ public class MuurvolgerBehavior implements Behavior {
 	}
 	
 	/**
-	 * Robot is moving towards from the wall the sonar is pointed to.
+	 * check if robot is moving towards from the wall the sonar is pointed to.
+	 * based on the current and previous distance sample
+	 * (note that there is a certain amount of noise of distance measurement)
 	 * @return
 	 */
 	private boolean isGettingCloser() {

@@ -12,6 +12,8 @@ package pcpanic;
 
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketPing;
+import geel.GUI.GUIConfigurationPanel;
+import geel.GUI.GUIStandAloneFrame;
 
 import java.awt.Color;
 import java.awt.Toolkit;
@@ -830,6 +832,8 @@ public class GUI extends javax.swing.JFrame {
             public void run() {
                 GUI gui = new GUI();
                 gui.setVisible(true);
+                
+                new GUIStandAloneFrame(new GUIConfigurationPanel(), "Configscreen");
             }
         });
     }

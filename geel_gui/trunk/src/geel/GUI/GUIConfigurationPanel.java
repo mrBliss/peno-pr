@@ -58,9 +58,13 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	private DefaultTableModel myBooleanTableModel;
 	
 	public GUIConfigurationPanel() {
-	    if(BTGateway.getInstance() != null)
-	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_STATUSUPDATE, this);
-
+	    if(BTGateway.getInstance() != null) {
+	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGBOOLEAN, this);
+	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGFLOAT, this);
+	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGINTEGER, this);
+	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGREQUEST, this);
+	    }
+	    
 	    myIntegerTableModel = new DefaultTableModel();
 	    JTable myIntegerTable = new JTable(myIntegerTableModel);    
 	    myIntegerTableModel.addColumn("Name");
@@ -135,10 +139,6 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    
 	}
 	
-	public void clearFields() {
-		
-	}
-	
 	public void createFields() {
 		// clear the panel first
 		
@@ -191,43 +191,85 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	}
 	
 	public void submitConfigSubmissionRequest() {
+		if(BTGateway.getInstance() == null) {
+			System.out.println("Not connected yet, not sending configuration submission request.");
+			return;
+		}
+
 		System.out.println("Sending config submission request to robot");
 		// clear current values
 		configBooleanValues.clear();
 		configFloatValues.clear();
 		configIntegerValues.clear();
-		// submit request
+		// submit request		
+		BTGateway.getInstance().sendPacket(new BTGWPacketConfigRequest());
+		
+		System.out.println("Request sent.");
 	}
 	
-	public void submitConfiguration() {
+	public void submitConfiguration() {		
+		if(BTGateway.getInstance() == null) {
+			System.out.println("Not connected yet, not sending configuration.");
+			return;
+		}
+		
 		System.out.println("Sending new config to robot");
+
 		// for each table and each value, submit a config SET request
 		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) {
 			String key = (String)myIntegerTableModel.getValueAt(i, 0);
 			Integer value = (Integer)myIntegerTableModel.getValueAt(i, 1);
 			
-			//System.out.println("Integer " + key + " = "+ value);			
+			System.out.println("Sending Integer " + key + " = "+ value);
+			BTGateway.getInstance().sendPacket(new BTGWPacketConfigInteger(key, value.intValue()));
 		}
 		
 		for(int i = 0; i < myFloatTableModel.getRowCount(); i++) {
 			String key = (String)myFloatTableModel.getValueAt(i, 0);
 			Float value = (Float)myFloatTableModel.getValueAt(i, 1);
 			
-			//System.out.println("Float " + key + " = "+ value);
+			System.out.println("Sending Float " + key + " = "+ value);
+			BTGateway.getInstance().sendPacket(new BTGWPacketConfigFloat(key, value.floatValue()));
 		}
 
 		for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) {
 			String key = (String)myBooleanTableModel.getValueAt(i, 0);
 			Boolean value = (Boolean)myBooleanTableModel.getValueAt(i, 1);
 			
-			//System.out.println("Boolean " + key + " = "+ value);
+			System.out.println("Sending Boolean " + key + " = "+ value);
+			BTGateway.getInstance().sendPacket(new BTGWPacketConfigBoolean(key, value.booleanValue()));
 		}
+		
+		System.out.println("Config sent.");
 	}
 
 	@Override
 	public void handlePacket(BTGWPacket packet) {
-		//if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGUPDATE) {
-		//	BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
-		//}
+		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGBOOLEAN) {
+			BTGWPacketConfigBoolean p = (BTGWPacketConfigBoolean) packet;
+			configBooleanValues.put(p.getKey(), p.getValue());
+			
+			createFields();
+		}
+		
+		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGFLOAT) {
+			BTGWPacketConfigFloat p = (BTGWPacketConfigFloat) packet;
+			configFloatValues.put(p.getKey(), p.getValue());
+			
+			createFields();
+		}
+		
+		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER) {
+			BTGWPacketConfigInteger p = (BTGWPacketConfigInteger) packet;
+			configIntegerValues.put(p.getKey(), p.getValue());
+			
+			createFields();
+		}
+
+		//not sure if a robot will ever do it, but meh :)
+		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGREQUEST) {
+			submitConfiguration();
+		}
+
 	}
 }

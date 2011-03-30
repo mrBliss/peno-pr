@@ -94,8 +94,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    configFloatValues.put("Testfloat1", 12.34f);
 	    configFloatValues.put("Testfloat2", -56.78f);
 	    
-	    createFields();	    
-	    printFields();
+	    updateGUITable();
 	    
 	    add(myIntegerTable);
 	    add(myFloatTable);
@@ -139,12 +138,11 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    
 	}
 	
-	public void createFields() {
+	public void updateGUITable() {
 		// clear the panel first
-		
-		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) myIntegerTableModel.removeRow(i);
-		for(int i = 0; i < myFloatTableModel.getRowCount(); i++) myFloatTableModel.removeRow(i);
-		for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) myBooleanTableModel.removeRow(i);
+		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) myIntegerTableModel.removeRow(0);
+		for(int i = 0; i < myFloatTableModel.getRowCount(); i++) myFloatTableModel.removeRow(0);
+		for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) myBooleanTableModel.removeRow(0);
 		
 		// for all integer values, add their fields
 		Iterator it = configIntegerValues.entrySet().iterator();
@@ -249,21 +247,21 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 			BTGWPacketConfigBoolean p = (BTGWPacketConfigBoolean) packet;
 			configBooleanValues.put(p.getKey(), p.getValue());
 			
-			createFields();
+			updateGUITable();
 		}
 		
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGFLOAT) {
 			BTGWPacketConfigFloat p = (BTGWPacketConfigFloat) packet;
 			configFloatValues.put(p.getKey(), p.getValue());
 			
-			createFields();
+			updateGUITable();
 		}
 		
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER) {
 			BTGWPacketConfigInteger p = (BTGWPacketConfigInteger) packet;
 			configIntegerValues.put(p.getKey(), p.getValue());
 			
-			createFields();
+			updateGUITable();
 		}
 
 		//not sure if a robot will ever do it, but meh :)

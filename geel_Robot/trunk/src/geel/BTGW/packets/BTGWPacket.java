@@ -36,9 +36,13 @@ public class BTGWPacket {
 	public static final int CMD_MESSAGE = 2;
 	public static final int CMD_DIE = 3;
 	public static final int CMD_STATUSUPDATE = 4;
+	public static final int CMD_CONFIGBOOLEAN = 5;
+	public static final int CMD_CONFIGINTEGER = 6;
+	public static final int CMD_CONFIGFLOAT = 7;
+	public static final int CMD_CONFIGREQUEST = 8;
 	
 	/* Update this when adding a new command */
-	public static final int CMD_AMOUNT = 5;
+	public static final int CMD_AMOUNT = 9;
 	
 	private int $commandCode;
 	
@@ -55,6 +59,14 @@ public class BTGWPacket {
 			return new BTGWPacketDie();
 		case CMD_STATUSUPDATE:
 			return new BTGWPacketStatusUpdate();
+		case CMD_CONFIGBOOLEAN:
+			return new BTGWPacketConfigBoolean();
+		case CMD_CONFIGINTEGER:
+			return new BTGWPacketConfigInteger();
+		case CMD_CONFIGFLOAT:
+			return new BTGWPacketConfigFloat();
+		case CMD_CONFIGREQUEST:
+			return new BTGWPacketConfigRequest();
 		default:
 			return null;
 		}
@@ -77,5 +89,19 @@ public class BTGWPacket {
 	 */
 	public void receive(DataInputStream input) throws IOException {
 		
+	}
+	
+	public String readString(DataInputStream input) throws IOException {
+		int len = input.readInt();
+		char m[] = new char[len];
+		for(int i = 0; i < len; i++) {
+			m[i] = input.readChar();
+		}
+		return new String(m);
+	}
+	 
+	public void writeString(DataOutputStream output, String s) throws IOException {		
+		output.writeInt(s.length());
+		output.writeChars(s);
 	}
 }

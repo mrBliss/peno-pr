@@ -3,6 +3,8 @@ package pcpanic.NXT;
 import geel.BTGW.infrastructure.*;
 import geel.BTGW.packets.*;
 import geel.BTGW.pc.*;
+import geel.GUI.GUIColorConfigurationPanel;
+import geel.GUI.GUIConfigurationPanel;
 import geel.GUI.GUISensorPanel;
 import geel.GUI.GUIStandAloneFrame;
 
@@ -118,6 +120,8 @@ public class Pilot implements IBTGWCommandListener {
         BTGateway.getInstance().addOmniListener(this);
         
         new GUIStandAloneFrame(new GUISensorPanel(), "Robot sensor data");
+        new GUIStandAloneFrame(new GUIConfigurationPanel(), "Configuration values");
+        new GUIStandAloneFrame(new GUIColorConfigurationPanel(), "Lightsensor calibrator");
     }
 
     public void close() {

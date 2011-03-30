@@ -1,5 +1,7 @@
 package geel;
 
+import java.io.IOException;
+
 import geel.BTGW.packets.*;
 import geel.BTGW.robot.*;
 import geel.BTGW.infrastructure.*;
@@ -99,14 +101,34 @@ public class WallTracker {
 					}
 				});
 		
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_DIE,
+				new IBTGWCommandListener() {
+
+					@Override
+					public void handlePacket(BTGWPacket packet) {
+						if (packet.getCommandCode() == BTGWPacket.CMD_DIE) {
+							System.out.println("Harakiri request!");
+							try {
+								BTGateway.getInstance().sendPacket(new BTGWPacketMessage("Shutting down"));
+								BTGateway.getInstance().close();
+							} catch (IOException e) {
+							}
+							System.exit(0);
+						}
+
+					}
+				});
+		
 		IBTGWCommandListener lightOperator = new IBTGWCommandListener() {
 					@Override
 					public void handlePacket(BTGWPacket packet) {
 						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_ON) {
-							RobotSpecs.lightSource.forward();
+							System.out.println("Turning light on");
+							RobotSpecs.lightSource.controlMotor(100, 1);
 						}
 						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_OFF) {
-							RobotSpecs.lightSource.stop();
+							RobotSpecs.lightSource.controlMotor(0, 4);
+							System.out.println("Turning light off");
 						}
 					}
 				};

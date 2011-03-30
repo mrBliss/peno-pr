@@ -39,7 +39,7 @@ public class RobotSpecs {
     
     public  static TachoMotorPort  leftMotorPort = MotorPort.A;
     public  static TachoMotorPort  rightMotorPort = MotorPort.C;
-    public  static BasicMotor  	   lightSource	  = Motor.B;
+    public  static MotorPort  	   lightSource	  = MotorPort.B;
     
     /**
      * specify the port to which each sensor is attached

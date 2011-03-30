@@ -133,11 +133,37 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		});
 	    buttonPane.add(uploadButton);	   
 
+	    final JButton lightButton = new JButton("Light");
+	    lightButton.addActionListener(new ActionListener() {
+			private boolean lightOn = false;
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				lightOn = !lightOn;
+				activeLightSource(lightOn);
+				lightButton.setLabel(lightOn ? "Light off" : "Light On");
+			}
+		});
+	    buttonPane.add(lightButton);
+	    
 	    add(buttonPane, BorderLayout.PAGE_END);
 	    
 	    
 	}
 	
+	protected void activeLightSource(boolean lightOn) {
+		if(BTGateway.getInstance() == null) {
+			System.out.println("Can not use light source, not connected.");
+			return;
+		}
+		
+		if(lightOn) {
+			BTGateway.getInstance().sendPacket(new BTGWPacketLightOn());
+		} else {
+			BTGateway.getInstance().sendPacket(new BTGWPacketLightOff());
+		}
+	}
+
 	public void updateGUITable() {
 		// clear the panel first
 		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) myIntegerTableModel.removeRow(0);

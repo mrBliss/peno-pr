@@ -35,7 +35,7 @@ public class WallTracker {
 
 		initilizeBTGateWay();
 
-		addPingListener();
+		addBackgroundListeners();
 
 		// start a thread that periodically sends the sensory data
 		Thread dataLogger = new Thread() {
@@ -83,7 +83,7 @@ public class WallTracker {
 	 * geel.BTGW.infrastructure.IBTGWCommandListener#handlePacket(geel.BTGW.
 	 * packets.BTGWPacket)
 	 */
-	private static void addPingListener() {
+	private static void addBackgroundListeners() {
 		BTGateway.getInstance().addListener(BTGWPacket.CMD_PING,
 				new IBTGWCommandListener() {
 
@@ -98,6 +98,20 @@ public class WallTracker {
 
 					}
 				});
+		
+		IBTGWCommandListener lightOperator = new IBTGWCommandListener() {
+					@Override
+					public void handlePacket(BTGWPacket packet) {
+						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_ON) {
+							RobotSpecs.lightSource.forward();
+						}
+						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_OFF) {
+							RobotSpecs.lightSource.stop();
+						}
+					}
+				};
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_LIGHT_ON, lightOperator);
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_LIGHT_OFF, lightOperator);
 	}
 
 	/**

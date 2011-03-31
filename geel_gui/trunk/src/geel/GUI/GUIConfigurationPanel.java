@@ -166,9 +166,12 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 
 	public void updateGUITable() {
 		// clear the panel first
-		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) myIntegerTableModel.removeRow(0);
-		for(int i = 0; i < myFloatTableModel.getRowCount(); i++) myFloatTableModel.removeRow(0);
-		for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) myBooleanTableModel.removeRow(0);
+		myIntegerTableModel.setRowCount(0);
+		myFloatTableModel.setRowCount(0);
+		myBooleanTableModel.setRowCount(0);
+		//for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) myIntegerTableModel.removeRow(0);
+		//for(int i = 0; i < myFloatTableModel.getRowCount(); i++) myFloatTableModel.removeRow(0);
+		//for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) myBooleanTableModel.removeRow(0);
 		
 		// for all integer values, add their fields
 		Iterator it = configIntegerValues.entrySet().iterator();
@@ -270,13 +273,14 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	}
 
 	@Override
-	public void handlePacket(BTGWPacket packet) {
+	public synchronized void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGBOOLEAN) {
 			BTGWPacketConfigBoolean p = (BTGWPacketConfigBoolean) packet;
 			configBooleanValues.put(p.getKey(), Boolean.toString(p.getValue()));			
 			System.out.println("Received boolean config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
+			return;
 		}
 		
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGFLOAT) {
@@ -285,6 +289,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 			System.out.println("Received float config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
+			return;
 		}
 		
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER) {
@@ -293,11 +298,13 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 			System.out.println("Received integer config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
+			return;
 		}
 
 		//not sure if a robot will ever do it, but meh :)
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGREQUEST) {
 			submitConfiguration();
+			return;
 		}
 
 	}

@@ -69,9 +69,6 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
 	    touchSensorNotPressedImage = Toolkit.getDefaultToolkit().getImage("images/nocollision.png");
 
-		int collW = touchSensorPressedImage.getWidth(null);
-		int collH = touchSensorPressedImage.getHeight(null);
-
 		setMinimumSize(new Dimension(450, 600));
 		setPreferredSize(new Dimension(450, 600));		
 	        	    

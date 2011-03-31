@@ -42,9 +42,10 @@ public class BTGWPacket {
 	public static final int CMD_CONFIGREQUEST = 8;
 	public static final int CMD_LIGHT_ON = 9;
 	public static final int CMD_LIGHT_OFF = 10;
+	public static final int CMD_MANUAL_STEER = 11;
 	
 	/* Update this when adding a new command */
-	public static final int CMD_AMOUNT = 11;
+	public static final int CMD_AMOUNT = 12;
 	
 	private int $commandCode;
 	
@@ -73,6 +74,8 @@ public class BTGWPacket {
 			return new BTGWPacketLightOn();
 		case CMD_LIGHT_OFF:
 			return new BTGWPacketLightOff();
+		case CMD_MANUAL_STEER:
+			return new BTGWPacketManualSteer();
 		default:
 			return null;
 		}

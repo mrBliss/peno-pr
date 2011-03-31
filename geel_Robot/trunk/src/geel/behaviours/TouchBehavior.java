@@ -2,6 +2,7 @@ package geel.behaviours;
 
 
 import geel.RMotor;
+import geel.RobotSpecs;
 import lejos.nxt.TouchSensor;
 import lejos.robotics.subsumption.Behavior;
 
@@ -20,7 +21,6 @@ public class TouchBehavior implements Behavior {
 	private int speed;
 	private RMotor motorLeft, motorRight;
 
-	private Boolean left;
 
 
 	/**
@@ -28,12 +28,11 @@ public class TouchBehavior implements Behavior {
 	 * @param motorRight 
 	 * 
 	 */
-	public TouchBehavior(TouchSensor touch, int speed, RMotor motorRight, RMotor motorLeft, Boolean left) {
+	public TouchBehavior(TouchSensor touch, int speed, RMotor motorRight, RMotor motorLeft) {
 		this.touch = touch;
 		this.speed = speed;
 		this.motorLeft = motorLeft;
 		this.motorRight = motorRight;
-		this.left = left;
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class TouchBehavior implements Behavior {
 		} catch (InterruptedException e) {
 			
 		}
-		if(left){
+		if(RobotSpecs.sonarPointsLeft){
 			motorLeft.forward();
     		motorRight.backward();        		
     	}

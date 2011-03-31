@@ -1,11 +1,15 @@
 package geel;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.infrastructure.IBTGWCommandListener;
 import geel.BTGW.packets.BTGWPacket;
+import geel.BTGW.packets.BTGWPacketConfigBoolean;
+import geel.BTGW.packets.BTGWPacketConfigFloat;
+import geel.BTGW.packets.BTGWPacketConfigInteger;
 
 /**
  * This class centralized the code needed to interactively configure Configurable classes
@@ -15,13 +19,25 @@ import geel.BTGW.packets.BTGWPacket;
  * @author jeroendv
  *
  */
-public class RobotBTGWConfigurator implements IBTGWCommandListener {
+public class RobotBTGWConfigurator {
 	
 	/**
 	 * a map that links parameter id's to a specific configurable object.
 	 * filled by registerId(...) 
 	 */
-	private static Hashtable idmap = new Hashtable();
+	private static Hashtable intIdMap = new Hashtable();
+	
+	/**
+	 * a map that links parameter id's to a specific configurable object.
+	 * filled by registerId(...) 
+	 */
+	private static Hashtable floatIdMap = new Hashtable();
+	
+	/**
+	 * a map that links parameter id's to a specific configurable object.
+	 * filled by registerId(...) 
+	 */
+	private static Hashtable boolIdMap = new Hashtable();
 	
 	
 	/**
@@ -45,7 +61,7 @@ public class RobotBTGWConfigurator implements IBTGWCommandListener {
 		
 		for (String boolId : boolIdList) {
 			try{
-				registerId(configurable, boolId);
+				registerBoolId(configurable, boolId);
 			} catch (IllegalArgumentException e){
 				//pass exception allong
 				throw e;
@@ -57,7 +73,7 @@ public class RobotBTGWConfigurator implements IBTGWCommandListener {
 		
 		for (String intId : intIdList) {
 			try {
-				registerId(configurable, intId);
+				registerIntId(configurable, intId);
 			} catch (IllegalArgumentException e) {
 				//pass exception allong
 				throw e;
@@ -69,7 +85,7 @@ public class RobotBTGWConfigurator implements IBTGWCommandListener {
 		
 		for (String floatId : floatIdList) {
 			try {
-				registerId(configurable, floatId);
+				registerFloatId(configurable, floatId);
 			} catch (IllegalArgumentException e) {
 				//pass exception allong
 				throw e;
@@ -80,7 +96,7 @@ public class RobotBTGWConfigurator implements IBTGWCommandListener {
 	}
 
 	/**
-	 * register a parameter in this.idmap
+	 * register a parameter
 	 * ensuring that the parameter id is unique
 	 * 
 	 * @param configurable
@@ -88,65 +104,138 @@ public class RobotBTGWConfigurator implements IBTGWCommandListener {
 	 * @throws IllegalArgumentException
 	 * 	thrown if a non-unique configurable parameter tries to register itself
 	 */
-	private static void registerId(Configurable configurable, String id)  throws IllegalArgumentException{
-		if(!isIdRegistered(id)){
-			RobotBTGWConfigurator.idmap.put(id, configurable);
+	private static void registerBoolId(Configurable configurable, String id)  throws IllegalArgumentException{
+		if(RobotBTGWConfigurator.boolIdMap.get(id) == null){
+			RobotBTGWConfigurator.boolIdMap.put(id, configurable);
 		}else{
 			throw new IllegalArgumentException("parameter id '"+id+"' already exists");
 		}
 	}
 	
 	/**
-	 * check if certain parameter id is already registered
-	 * @param id
-	 * @return
-	 */
-	private static boolean isIdRegistered(String id) {
-		return RobotBTGWConfigurator.idmap.get(id) != null;
-	}
-
-
-
-
-
-
-
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	/* 
+	 * register a parameter
+	 * ensuring that the parameter id is unique
 	 * 
-	 * (non-Javadoc)
-	 * @see geel.BTGW.infrastructure.IBTGWCommandListener#handlePacket(geel.BTGW.packets.BTGWPacket)
+	 * @param configurable
+	 * @param id
+	 * @throws IllegalArgumentException
+	 * 	thrown if a non-unique configurable parameter tries to register itself
 	 */
-	@Override
-	public void handlePacket(BTGWPacket packet) {
-		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGREQUEST){
-			
-			
+	private static void registerIntId(Configurable configurable, String id)  throws IllegalArgumentException{
+		if(RobotBTGWConfigurator.intIdMap.get(id) == null){
+			RobotBTGWConfigurator.intIdMap.put(id, configurable);
+		}else{
+			throw new IllegalArgumentException("parameter id '"+id+"' already exists");
 		}
-		
-		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGBOOLEAN){
-			
+	}
+	
+	/**
+	 * register a parameter
+	 * ensuring that the parameter id is unique
+	 * 
+	 * @param configurable
+	 * @param id
+	 * @throws IllegalArgumentException
+	 * 	thrown if a non-unique configurable parameter tries to register itself
+	 */
+	private static void registerFloatId(Configurable configurable, String id)  throws IllegalArgumentException{
+		if( RobotBTGWConfigurator.floatIdMap.get(id) == null ){
+			RobotBTGWConfigurator.floatIdMap.put(id, configurable);
+		}else{
+			throw new IllegalArgumentException("parameter id '"+id+"' already exists");
 		}
-		
-		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGFLOAT){
+	}
+	
+
+	/**
+	 * register routines with the BTGateway for configuration purpose.
+	 * handling config requests, boolean configs, integer configs and float configs.
+	 * 
+	 * it requires that the BTGateway is up and functional
+	 */
+	public static void registerWithBTGW(){
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGREQUEST, new IBTGWCommandListener() {
 			
-		}
+			@Override
+			public void handlePacket(BTGWPacket packet) {
+				Enumeration idEnum;
+				String id;
+				Configurable configurable;
+				
+				//send all boolean parameters
+				idEnum = RobotBTGWConfigurator.boolIdMap.keys();
+				
+				while( idEnum.hasMoreElements() ){
+					id = (String) idEnum.nextElement();
+					configurable = (Configurable) RobotBTGWConfigurator.boolIdMap.get(id);
+					boolean value = configurable.getConfigurableBoolean(id);
+					
+					BTGateway.getInstance().sendPacket(new BTGWPacketConfigBoolean(id,value));
+				}
+				
+				//send all integer parameters
+				idEnum = RobotBTGWConfigurator.intIdMap.keys();
+				
+				while( idEnum.hasMoreElements() ){
+					id = (String) idEnum.nextElement();
+					configurable  = (Configurable) RobotBTGWConfigurator.intIdMap.get(id);
+					int value = configurable.getConfigurableInt(id);
+					
+					BTGateway.getInstance().sendPacket(new BTGWPacketConfigInteger(id,value));
+				}
+				
+				//send all float parameters
+				idEnum = RobotBTGWConfigurator.floatIdMap.keys();
+				
+				while( idEnum.hasMoreElements() ){
+					id = (String) idEnum.nextElement();
+					configurable  = (Configurable) RobotBTGWConfigurator.floatIdMap.get(id);
+					float value = configurable.getConfigurableFloat(id);
+					
+					BTGateway.getInstance().sendPacket(new BTGWPacketConfigFloat(id,value));
+				}
+				
+			}
+		});
 		
-		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER){
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGBOOLEAN, new IBTGWCommandListener() {
 			
-		}
+			@Override
+			public void handlePacket(BTGWPacket packet) {
+				String id = ((BTGWPacketConfigBoolean) packet).getKey();
+				boolean value = ((BTGWPacketConfigBoolean) packet).getValue();
+				
+				Configurable configurable = (Configurable) RobotBTGWConfigurator.boolIdMap.get(id);
+				configurable.setConfigurableBoolean(id, value);
+			}
+		});
 		
+		BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGINTEGER, new IBTGWCommandListener() {
+			
+			@Override
+			public void handlePacket(BTGWPacket packet) {
+				String id = ((BTGWPacketConfigInteger) packet).getKey();
+				int value = ((BTGWPacketConfigInteger) packet).getValue();
+				
+				Configurable configurable = (Configurable) RobotBTGWConfigurator.intIdMap.get(id);
+				configurable.setConfigurableInt(id, value);				
+			}
+		});
+
+	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGFLOAT, new IBTGWCommandListener() {
+	
+		@Override
+		public void handlePacket(BTGWPacket packet) {	
+			String id = ((BTGWPacketConfigFloat) packet).getKey();
+			float value = ((BTGWPacketConfigFloat) packet).getValue();
+		
+			Configurable configurable = (Configurable) RobotBTGWConfigurator.floatIdMap.get(id);
+			configurable.setConfigurableFloat(id, value);			
+		}
+	});
 		
 	}
+	
 	
 	
 	

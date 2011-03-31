@@ -86,14 +86,14 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		Graphics2D g2 = (Graphics2D)g;
 		
 		g2.setColor(bgColor);
-		g2.fillRect(0, 0, 600, 600);
+		g2.fillRect(0, 0, getWidth(), getHeight());
 		
 		int collW = touchSensorPressedImage.getWidth(null);
 		int collH = touchSensorPressedImage.getHeight(null);
 		
 		drawCollisionIndicator(g2, 300 - collW/2, 0);
 		drawSonarWave(g2, 0,collH);
-		drawLightSensorValues(g2, 300 - lightSensorWidth / 2, collH);	
+		drawLightSensorValues(g2, 300 - lightSensorWidth, collH);	
 	}
 	
 	private void drawLightSensorValues(Graphics2D g2, int tlx, int tly) {

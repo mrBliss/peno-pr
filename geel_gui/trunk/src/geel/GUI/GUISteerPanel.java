@@ -40,7 +40,8 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 	private static final long serialVersionUID = 7164671065144321970L;
 	private boolean inFocus = false;
 	
-
+	private int steerSpeed = 200;
+	private int driveSpeed = 700;
 
 	private boolean upActive = false;
 	private boolean downActive = false;
@@ -67,6 +68,70 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 		setFocusable(true);
 		addKeyListener(this);
 		addFocusListener(this);
+		
+		Thread steerThread = new Thread() {
+			public void run() {
+				boolean lastUp = false;
+				boolean lastDown = false;
+				boolean lastLeft = false;
+				boolean lastRight = false;
+				
+				boolean update = false;
+				
+				while(true) {
+					update = false;
+					
+					boolean currUp = isUpActive();
+					boolean currDown = isDownActive();
+					boolean currLeft = isLeftActive();
+					boolean currRight = isRightActive();
+					
+					if(lastUp != currUp) {
+						lastUp = currUp;
+						update = true;						
+					}
+
+					if(lastDown != currDown) {
+						lastDown = currDown;
+						update = true;
+					}
+
+					if(lastLeft != currLeft) {
+						lastLeft = currLeft;
+						update = true;
+					}
+
+					if(lastRight != currRight) {
+						lastRight = currRight;
+						update = true;
+					}
+					
+					if(update) {
+
+						int leftSpeed = 0;
+						int rightSpeed = 0;
+						
+						if(lastUp) { leftSpeed += driveSpeed; rightSpeed += driveSpeed; }
+						if(lastDown) { leftSpeed -= driveSpeed; rightSpeed -= driveSpeed; }
+						if(lastLeft) { leftSpeed -= steerSpeed; rightSpeed += steerSpeed; }
+						if(lastRight) { leftSpeed += steerSpeed; rightSpeed -= steerSpeed; }
+						
+						System.out.println("Setting new speeds to L="+leftSpeed + " R="+rightSpeed);
+						
+						if(BTGateway.getInstance() != null)
+							BTGateway.getInstance().sendPacket(new BTGWPacketManualSteer(leftSpeed, rightSpeed));
+					}
+					
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		steerThread.start();
 	}
 
 	@Override
@@ -103,96 +168,6 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 		
 	public static void main(String[] args) {
 		final GUISteerPanel p = new GUISteerPanel();
-	
-		Thread steerThread = new Thread() {
-			public void run() {
-				boolean lastUp = false;
-				boolean lastDown = false;
-				boolean lastLeft = false;
-				boolean lastRight = false;
-				
-				boolean update = false;
-				
-				while(true) {
-					update = false;
-					
-					boolean currUp = p.isUpActive();
-					boolean currDown = p.isDownActive();
-					boolean currLeft = p.isLeftActive();
-					boolean currRight = p.isRightActive();
-					
-					if(lastUp != currUp) {
-						lastUp = currUp;
-						update = true;
-						
-//						if(currUp) {
-//							System.out.println("Up pressed");
-//						} else {
-//							System.out.println("Up released");
-//						}
-					}
-
-					if(lastDown != currDown) {
-						lastDown = currDown;
-						update = true;
-						
-//						if(currDown) {
-//							System.out.println("Down pressed");
-//						} else {
-//							System.out.println("Down released");
-//						}
-					}
-
-					if(lastLeft != currLeft) {
-						lastLeft = currLeft;
-						update = true;
-						
-//						if(currLeft) {
-//							System.out.println("Left pressed");
-//						} else {
-//							System.out.println("Left released");
-//						}
-					}
-
-					if(lastRight != currRight) {
-						lastRight = currRight;
-						update = true;
-						
-//						if(currRight) {
-//							System.out.println("Right pressed");
-//						} else {
-//							System.out.println("Right released");
-//						}
-					}
-					
-					if(update) {
-						int steerSpeed = 50;
-						int driveSpeed = 200;
-						int leftSpeed = 0;
-						int rightSpeed = 0;
-						
-						if(lastUp) { leftSpeed += driveSpeed; rightSpeed += driveSpeed; }
-						if(lastDown) { leftSpeed -= driveSpeed; rightSpeed -= driveSpeed; }
-						if(lastLeft) { rightSpeed += steerSpeed; }
-						if(lastRight) { leftSpeed += steerSpeed; }
-						
-						System.out.println("Setting new speeds to L="+leftSpeed + " R="+rightSpeed);
-						
-						if(BTGateway.getInstance() != null)
-							BTGateway.getInstance().sendPacket(new BTGWPacketManualSteer(leftSpeed, rightSpeed));
-					}
-					
-					try {
-						sleep(10);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-		steerThread.start();
-		
 		new GUIStandAloneFrame(p, "Testing steeringpanel");
 	}
 
@@ -227,12 +202,16 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 	@Override
 	public void focusGained(FocusEvent arg0) {
 		inFocus = true;
+		System.out.println("Taking manual control");
+		if(BTGateway.getInstance() != null) BTGateway.getInstance().sendPacket(new BTGWPacketManualOverride(true));
 		repaint();
 	}
 
 	@Override
 	public void focusLost(FocusEvent arg0) {
 		inFocus = false;
+		System.out.println("Release manual control");
+		if(BTGateway.getInstance() != null) BTGateway.getInstance().sendPacket(new BTGWPacketManualOverride(false));
 		repaint();
 	}
 }

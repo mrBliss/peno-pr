@@ -1,140 +1,71 @@
 package geel.behaviours;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.infrastructure.IBTGWCommandListener;
+import geel.BTGW.packets.BTGWPacket;
+import geel.BTGW.packets.BTGWPacketManualOverride;
+import geel.BTGW.packets.BTGWPacketManualSteer;
 import lejos.nxt.Motor;
-import lejos.nxt.Sound;
-import lejos.nxt.comm.BTConnection;
-import lejos.nxt.comm.Bluetooth;
 import lejos.robotics.subsumption.Behavior;
 
-public class Manual implements Behavior {
-
-    private DataInputStream str;
-    private DataOutputStream stro;
+public class Manual implements Behavior, IBTGWCommandListener {
     private Motor rightMotor;
     private Motor leftMotor;
     private boolean active = false;
 
     public Manual(Motor rightMotor, Motor leftMotor) {
-        System.out.println("klaar om te ontvangen");
-        BTConnection conn = Bluetooth.waitForConnection();
-        str = conn.openDataInputStream();
-        stro = conn.openDataOutputStream();
-        System.out.println("data stream open");
-        System.setOut(new PrintStream(stro));
         this.rightMotor = rightMotor;
         this.leftMotor = leftMotor;
+        
+        BTGateway.getInstance().addListener(BTGWPacket.CMD_MANUAL_STEER, this);
+        BTGateway.getInstance().addListener(BTGWPacket.CMD_MANUAL_OVERRIDE, this);
     }
 
     public boolean takeControl() {
-        if (active) {
-            return true;
-        }
-        try {
-            while (str.available() > 0) {
-                byte br = str.readByte();
-                if (br == 10) {
-                    active = true;
-                    return true;
-                }
-                if (br == 12) {
-                    panic();
-                    return false;
-                }
-            }
-            return false;
-        } catch (IOException ex) {
-            return false;
-        }
+    	return active;
     }
 
     public void action() {
-        active = true;
+    	active = true;
         leftMotor.stop();
         rightMotor.stop();
-        System.out.println("Start manual");
-        boolean cont = true;
-        while (cont) {
-            try {
-                byte bt = str.readByte();
-                if (bt == 0) {
-                    rightMotor.stop();
-                    leftMotor.stop();
-                } else if (bt == 11) {
-                    cont = false;
-                } else if (bt == 20) {
-                    byte ml = str.readByte();
-                    byte mr = str.readByte();
-                    mCommand(leftMotor, ml);
-                    mCommand(rightMotor, mr);
-                } else if (bt / 10 == 3) {
-                    toeter(bt % 10);
-                } else if (bt == 21) {
-                    byte ml = str.readByte();
-                    byte mr = str.readByte();
-                    Sound.playTone(ml * 10, mr * 10);
-                } else if (bt == 22) {
-                	System.exit(0);
-                }
-            } catch (Exception ex) {
-                Sound.buzz();
-                System.out.println("klaar om te ontvangen");
-                BTConnection conn = Bluetooth.waitForConnection();
-                str = conn.openDataInputStream();
-                System.out.println("data stream open");
-            }
+        
+        while (active) {
+        	try { Thread.sleep(10); } catch (InterruptedException e) {}
         }
-        System.out.println("Exit manual");
-        active = false;
     }
 
     public void suppress() {
-        // should be impossible
+        active = false;
+    }
+    
+    public void setMotors(int left, int right) {
+    	if(!active) return;
+    	
+    	if(left != 0) {
+    		leftMotor.setSpeed(Math.abs(left));
+    		if(left > 0) leftMotor.forward();
+    		else leftMotor.backward();
+    	} else leftMotor.stop();
+    	
+    	if(right != 0) {
+    		rightMotor.setSpeed(Math.abs(right));
+    		if(right > 0) rightMotor.forward();
+    		else rightMotor.backward();
+    	} else rightMotor.stop();
+    	
     }
 
-    private void mCommand(Motor motor, byte command) {
-        if (command == 100) {
-            return;
-        } else if (command == 101) {
-            motor.reverseDirection();
-        } else if (command == 102) {
-            motor.forward();
-        } else if (command == 103) {
-            motor.backward();
-        } else if (100 > command && command >= 0) {
-            motor.setSpeed(10 * command);
-            motor.forward();
-        } else if (-100 <= command && command < 0) {
-            motor.setSpeed((command * -10));
-            motor.backward();
-        }
-    }
-
-    private void toeter(int i) {
-        if (i == 0) {
-            Sound.beep();
-        } else if (i == 1) {
-            Sound.beepSequence();
-        } else if (i == 2) {
-            Sound.beepSequenceUp();
-        } else if (i == 3) {
-            Sound.buzz();
-        }
-    }
-
-    private void panic() {
-        try {
-            rightMotor.backward();
-            leftMotor.backward();
-            Thread.sleep(400);
-            rightMotor.forward();
-            Thread.sleep(400);
-            leftMotor.forward();
-
-        } catch (InterruptedException ex) {
-        }
-    }
+	@Override
+	public void handlePacket(BTGWPacket packet) {
+		if(packet.getCommandCode() == BTGWPacket.CMD_MANUAL_STEER) {
+			BTGWPacketManualSteer p = (BTGWPacketManualSteer) packet;
+			setMotors(p.getLeft(), p.getRight());
+		}
+		
+		if(packet.getCommandCode() == BTGWPacket.CMD_MANUAL_OVERRIDE) {
+			BTGWPacketManualOverride p = (BTGWPacketManualOverride) packet;
+			active = p.isActive();
+		}
+	}
 }

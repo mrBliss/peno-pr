@@ -5,6 +5,7 @@ import java.io.IOException;
 import geel.BTGW.packets.*;
 import geel.BTGW.robot.*;
 import geel.BTGW.infrastructure.*;
+import geel.behaviours.Manual;
 import geel.behaviours.MuurvolgerBehavior;
 import geel.behaviours.TouchBehavior;
 import lejos.nxt.LightSensor;
@@ -67,8 +68,9 @@ public class WallTracker {
 		 * lowest to highest behavior priority
 		 */
 		Behavior[] bArray = new Behavior[] {
-				new MuurvolgerBehavior(sonar, motorRight, motorLeft),
-				new TouchBehavior(touch, motorRight, motorLeft)
+				new MuurvolgerBehavior(sonar,motorRight, motorLeft),
+				new TouchBehavior(touch, motorRight, motorLeft),
+				new Manual(motorRight, motorLeft)
 			};
 
 		/* instantiate an arbitrator */

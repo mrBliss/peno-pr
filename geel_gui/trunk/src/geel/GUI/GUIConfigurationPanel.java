@@ -243,7 +243,8 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		// for each table and each value, submit a config SET request
 		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) {
 			String key = (String)myIntegerTableModel.getValueAt(i, 0);
-			Integer value = (Integer)myIntegerTableModel.getValueAt(i, 1);
+			Integer value = Integer.parseInt((String)myIntegerTableModel.getValueAt(i, 1));
+			
 			
 			System.out.println("Sending Integer " + key + " = "+ value);
 			BTGateway.getInstance().sendPacket(new BTGWPacketConfigInteger(key, value.intValue()));
@@ -251,7 +252,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		
 		for(int i = 0; i < myFloatTableModel.getRowCount(); i++) {
 			String key = (String)myFloatTableModel.getValueAt(i, 0);
-			Float value = (Float)myFloatTableModel.getValueAt(i, 1);
+			Float value = Float.parseFloat((String)myFloatTableModel.getValueAt(i, 1));
 			
 			System.out.println("Sending Float " + key + " = "+ value);
 			BTGateway.getInstance().sendPacket(new BTGWPacketConfigFloat(key, value.floatValue()));
@@ -259,7 +260,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 
 		for(int i = 0; i < myBooleanTableModel.getRowCount(); i++) {
 			String key = (String)myBooleanTableModel.getValueAt(i, 0);
-			Boolean value = (Boolean)myBooleanTableModel.getValueAt(i, 1);
+			Boolean value = Boolean.parseBoolean((String)myBooleanTableModel.getValueAt(i, 1));
 			
 			System.out.println("Sending Boolean " + key + " = "+ value);
 			BTGateway.getInstance().sendPacket(new BTGWPacketConfigBoolean(key, value.booleanValue()));

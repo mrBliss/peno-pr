@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import geel.BTGW.infrastructure.BTGWConnection;
 import geel.BTGW.infrastructure.BTGateway;
@@ -38,7 +40,20 @@ import lejos.pc.comm.NXTInfo;
 public class GUIConnectPanel extends JPanel {
 	private static final long serialVersionUID = -2601617076907696631L;
 	
-	private NXTInfo[] robotInfoList;
+
+	
+	private final ArrayList<String> staticRobotNames = new ArrayList<String>(){{
+		add("ROOD");
+		add("blauw");
+	}};
+	
+	private final ArrayList<String> staticRobotAddresses = new ArrayList<String>(){{
+		add("0016530623A0");
+		add("00165302F79D");
+	}};
+	
+	private ArrayList<String> robotNames = new ArrayList<String>(staticRobotNames);
+	private ArrayList<String> robotAddresses = new ArrayList<String>(staticRobotAddresses);
 	
 	private JTextArea output;
 	private JButton scanButton;
@@ -165,11 +180,14 @@ public class GUIConnectPanel extends JPanel {
         //bottomHalf.setMinimumSize(new Dimension(400, 50));
         bottomHalf.setPreferredSize(new Dimension(600, 135));
         splitPane.add(bottomHalf);
+        
+        
+        displayRobotList();
 	}
 	
 	protected boolean connectToRobot() {
-		String name = robotInfoList[selectedRobotIndex].name;
-		String address = robotInfoList[selectedRobotIndex].deviceAddress;
+		String name = robotNames.get(selectedRobotIndex);
+		String address = robotAddresses.get(selectedRobotIndex);
 		
 		output.append("Connecting to robot "+name +" @ "+address+"\n");
 		
@@ -209,23 +227,38 @@ public class GUIConnectPanel extends JPanel {
         
         return true;
 	}
+	
+	public void displayRobotList() {
+		listModel.clear();
+		selectedRobotIndex = -1;
+		
+		for(int i = 0; i < robotNames.size(); i++) {
+			String name = robotNames.get(i);
+			String address = robotAddresses.get(i);
+			System.out.println("Robot "+name + " at "+ address);
+			listModel.addElement(address+" ("+name+")");
+		}
+		
+		repaint();
+	}
 
 	public void updateRobotList() {
 		try {
 			NXTComm BTComm = NXTCommFactory.createNXTComm(NXTCommFactory.BLUETOOTH);
-			robotInfoList = BTComm.search(null, NXTCommFactory.BLUETOOTH);
+			NXTInfo[] robotInfoList = BTComm.search(null, NXTCommFactory.BLUETOOTH);
 			
-			listModel.clear();
-			selectedRobotIndex = -1;
-			connectButton.setEnabled(false);
+			robotNames = new ArrayList<String>(staticRobotNames);
+			robotAddresses = new ArrayList<String>(staticRobotAddresses);
 			
-			for(NXTInfo robot: robotInfoList) {
-				System.out.println("Robot "+robot.name + " at "+ robot.deviceAddress);
-				listModel.addElement(robot.deviceAddress+" ("+robot.name+")");
+			for(NXTInfo info: robotInfoList) {
+				if(!robotAddresses.contains(info.deviceAddress)) {
+					robotNames.add(info.name);
+					robotAddresses.add(info.deviceAddress);
+				}
 			}
 			
-			repaint();
-		
+			connectButton.setEnabled(false);
+			displayRobotList();
 		} catch (NXTCommException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -263,7 +296,7 @@ public class GUIConnectPanel extends JPanel {
             int index = lsm.getMinSelectionIndex();
 
             if(!isAdjusting) {
-            	output.append("Selected robot "+robotInfoList[index].name + " @ "+ robotInfoList[index].deviceAddress + "\n");
+            	output.append("Selected robot "+robotNames.get(index) + " @ "+ robotAddresses.get(index) + "\n");
             	selectedRobotIndex = index;
             	connectButton.setEnabled(true);
             }

@@ -21,7 +21,7 @@ public class ConfigTest {
 		
 		RobotBTGWConfigurator.registerWithBTGW();
 		
-		RobotBTGWConfigurator.register(bogusConfigurableObject);
+		RobotBTGWConfigurator.register(new BogusConfigurableObject());
 		
 	}
 
@@ -51,7 +51,7 @@ public class ConfigTest {
 	}
 	
 	
-	private static Configurable bogusConfigurableObject = new Configurable() {
+	private static class BogusConfigurableObject implements Configurable {
 		
 		private final String testBoolId = "testBoolId";
 		private boolean testBool = false;

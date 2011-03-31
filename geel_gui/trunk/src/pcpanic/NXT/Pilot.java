@@ -96,7 +96,9 @@ public class Pilot implements IBTGWCommandListener {
 //        outputStream = open.getOutputStream();
 //        inputStream = open.getInputStream();
         
-        BTGWConnection btgwconn = new BTGWRealConnectionMaker("ROOD", "00:16:53:06:23:A0");
+        //fixme: this should be set by the Gui or something
+//        BTGWConnection btgwconn = new BTGWRealConnectionMaker("ROOD", "00:16:53:06:23:A0");
+    	BTGWConnection btgwconn = new BTGWRealConnectionMaker("WallE", "00:16:53:02:F7:9D");
 
         /* connect to it */
         btgwconn.connect();

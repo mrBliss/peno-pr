@@ -60,35 +60,18 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	private int MAX_HISTORY = 1000;
 	
 	private int tresholdWhiteBrown = 666;
+	private String tresholdWhiteBrownToken = "tresholdWhiteBrown";
 	private int tresholdBrownBlack = 333;
+	private String tresholdBrownBlackToken = "tresholdBrownBlack";
 	
 	private int maxValue = 1023;
 	
 	private boolean whiteBrownSelected = false;
 	
 	public GUIColorConfigurationPanel() {
-		System.out.println("I don't know what my tresholds are ... where is my registry ?!?!");
+		
 		addMouseListener(this);
 		addMouseMotionListener(this);
-
-//		//simulate test data 		
-//	    Thread sine = new Thread() {
-//	    	public void run() {
-//	    		int counter = 0;
-//	    		while(true) {
-//	    			addLightValue((int)(50 + (50 * Math.sin(((float)counter) / 100.0f))));
-//	    			counter++;
-//	    			
-//	    			try {
-//						sleep(50);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//	    		}
-//	    	}
-//	    };
-//	    sine.start();
 	    
 	    if(BTGateway.getInstance() != null) {
 	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGINTEGER, this);
@@ -96,6 +79,9 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	    } else {
 	    	return;
 	    }	  
+	    
+	    System.out.println("I don't know what my tresholds are ... Requesting information");
+	    BTGateway.getInstance().sendPacket(new BTGWPacketConfigRequest());
 	}
 	
 	
@@ -185,6 +171,18 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
 			addLightValue(p.getLightSensorValue());
 		}
+		
+		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER) {
+			BTGWPacketConfigInteger p = (BTGWPacketConfigInteger) packet;
+			
+			if(p.getKey().equals(tresholdBrownBlackToken)) {
+				tresholdBrownBlack = p.getValue();
+			}
+			
+			if(p.getKey().equals(tresholdWhiteBrownToken)) {
+				tresholdWhiteBrown = p.getValue();
+			}			
+		}
 	}
 
 	private void addLightValue(int _lightSensorValue) {		
@@ -207,7 +205,13 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	}
 	public void mouseReleased(MouseEvent e) {
 		// update value in robot
-		System.out.println("FIXME: setting color calibration");
+		System.out.println("Sending color calibration");
+		
+		BTGateway.getInstance().sendPacket(new BTGWPacketConfigInteger(tresholdBrownBlackToken, tresholdBrownBlack));
+		BTGateway.getInstance().sendPacket(new BTGWPacketConfigInteger(tresholdWhiteBrownToken, tresholdWhiteBrown));
+		
+		//let the robot send his new config to all listeners
+		BTGateway.getInstance().sendPacket(new BTGWPacketConfigRequest());
 	}
 	public void mouseDragged(MouseEvent e) {
 		int v = convertYFromScreen(e.getY());

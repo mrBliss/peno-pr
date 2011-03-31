@@ -59,8 +59,10 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	private ArrayList<Integer> lightValues = new ArrayList<Integer>();
 	private int MAX_HISTORY = 1000;
 	
-	private int tresholdWhiteBrown = 66;
-	private int tresholdBrownBlack = 33;
+	private int tresholdWhiteBrown = 666;
+	private int tresholdBrownBlack = 333;
+	
+	private int maxValue = 1023;
 	
 	private boolean whiteBrownSelected = false;
 	
@@ -68,24 +70,25 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 		System.out.println("I don't know what my tresholds are ... where is my registry ?!?!");
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		    
-	    Thread sine = new Thread() {
-	    	public void run() {
-	    		int counter = 0;
-	    		while(true) {
-	    			addLightValue((int)(50 + (50 * Math.sin(((float)counter) / 100.0f))));
-	    			counter++;
-	    			
-	    			try {
-						sleep(50);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	    		}
-	    	}
-	    };
-	    sine.start();
+
+//		//simulate test data 		
+//	    Thread sine = new Thread() {
+//	    	public void run() {
+//	    		int counter = 0;
+//	    		while(true) {
+//	    			addLightValue((int)(50 + (50 * Math.sin(((float)counter) / 100.0f))));
+//	    			counter++;
+//	    			
+//	    			try {
+//						sleep(50);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//	    		}
+//	    	}
+//	    };
+//	    sine.start();
 	    
 	    if(BTGateway.getInstance() != null) {
 	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_CONFIGINTEGER, this);
@@ -153,26 +156,26 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	private int convertXFromScreen(int val) {
 		int currWidth = getWidth();
 
-		return 100 - (val * 100 / currWidth);
+		return maxValue - (val * maxValue / currWidth);
 	}
 	
 	private int convertXToScreen(int val) {
 		int currWidth = getWidth();
 		
-		return (100 - val) * currWidth / 100;
+		return (maxValue - val) * currWidth / maxValue;
 	}
 
 	
 	private int convertYFromScreen(int val) {
 		int currHeight = getHeight();
 
-		return 100 - (val * 100 / currHeight);
+		return maxValue - (val * maxValue / currHeight);
 	}
 	
 	private int convertYToScreen(int val) {
 		int currHeight = getHeight();
 		
-		return (100 - val) * currHeight / 100;
+		return (maxValue - val) * currHeight / maxValue;
 	}
 
 
@@ -217,10 +220,10 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 		}
 		
 		if(tresholdBrownBlack < 0) tresholdBrownBlack = 0;
-		if(tresholdBrownBlack > 100) tresholdBrownBlack = 100;
+		if(tresholdBrownBlack > maxValue) tresholdBrownBlack = maxValue;
 		
 		if(tresholdWhiteBrown < 0) tresholdWhiteBrown = 0;
-		if(tresholdWhiteBrown > 100) tresholdWhiteBrown = 100;
+		if(tresholdWhiteBrown > maxValue) tresholdWhiteBrown = maxValue;
 
 		repaint();
 	}

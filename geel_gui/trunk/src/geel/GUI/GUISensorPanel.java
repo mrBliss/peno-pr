@@ -44,7 +44,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private Color lightBGColor = bgColor;
 	private int lightTopMargin = 20;
 	private int lightSensorWidth = 40;
-	private int MAXLIGHTVALUE = 100;
+	private int MAXLIGHTVALUE = 1023;
 	
 	// sonar widget parameters	
 	private Color sonarBGColor = bgColor;

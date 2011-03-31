@@ -10,6 +10,7 @@ import java.io.PrintStream;
 
 import geel.BTGW.infrastructure.BTGWConnection;
 import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.packets.BTGWPacketDie;
 import geel.BTGW.pc.BTGWRealConnectionMaker;
 
 import javax.swing.BorderFactory;
@@ -123,7 +124,13 @@ public class GUIConnectPanel extends JPanel {
 				} else {
 					// break down connection gently
 					try {
+						// fixme: calling disconnect takes a long time
+						output.append("sending Robot DIE command");
+						BTGateway.getInstance().sendPacket(new BTGWPacketDie());
+						
+						output.append("disconnecting");
 						BTGateway.getInstance().close();
+						output.append("disconnected: BTGateway is closed");
 						connected = false;
 						connectButton.setLabel("Connect");
 					} catch (IOException e1) {

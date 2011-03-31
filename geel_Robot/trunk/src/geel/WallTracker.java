@@ -6,6 +6,7 @@ import geel.BTGW.packets.*;
 import geel.BTGW.robot.*;
 import geel.BTGW.infrastructure.*;
 import geel.behaviours.MuurvolgerBehavior;
+import geel.behaviours.TouchBehavior;
 import lejos.nxt.LightSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
@@ -50,7 +51,7 @@ public class WallTracker {
 					BTGateway.getInstance().sendPacket(
 							new BTGWPacketStatusUpdate(_light, _sonar, _touch));
 					try {
-						sleep(50);
+						sleep(100);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						// e.printStackTrace();
@@ -66,6 +67,7 @@ public class WallTracker {
 		 */
 		Behavior[] bArray = new Behavior[] {
 				new MuurvolgerBehavior(sonar,speed, motorRight, motorLeft),
+				new TouchBehavior(touch, speed, motorRight, motorLeft)
 			};
 
 		/* instantiate an arbitrator */

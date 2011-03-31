@@ -50,6 +50,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private int lightTopMargin = 20;
 	private int lightSensorWidth = 40;
 	private int MAXLIGHTVALUE = 1023;
+	private Color brown = new Color(225, 169, 95);
 	
 	// sonar widget parameters	
 	private Color sonarBGColor = bgColor;
@@ -135,8 +136,21 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		
 		for(int i = 0; i < lightSensorRealValues.size(); i++) {
 			int y = tly + i + lightTopMargin;
-			float scaled = (float)lightSensorRealValues.get(i).intValue() / (float)MAXLIGHTVALUE; 
-			g2.setColor(new Color(scaled,scaled,scaled));
+			
+			switch(lightSensorValues.get(i).intValue()) {
+				case 0:
+					g2.setColor(Color.BLACK);
+					break;
+				case 1:
+					g2.setColor(brown);
+					break;
+				case 2:
+					g2.setColor(Color.WHITE);
+					break;
+				default:
+					g2.setColor(Color.RED);
+					break;
+			}
 			g2.drawLine(tlx+areaW, y, tlx+(2*areaW), y);
 		}
 		
@@ -145,16 +159,16 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private void drawSonarWave(Graphics2D g2, int tlx, int tly) {
 		int areaW = MAXSONARVALUE;
 		int areaH = MAX_HISTORY;
-		int swipeWidth = sonarSweepImage.getWidth(this);
+//		int swipeWidth = sonarSweepImage.getWidth(this);
 		
-		if(swipeWidth < 0)
-			return;
-		
-		if(sonarSweepImageBuffer == null) {
-			sonarSweepImageBuffer = new BufferedImage(swipeWidth, areaH ,BufferedImage.TYPE_INT_ARGB);
-			Graphics newg = sonarSweepImageBuffer.getGraphics();
-			newg.drawImage(sonarSweepImage, 0, 0, swipeWidth, areaH, this);
-		}
+//		if(swipeWidth < 0)
+//			return;
+//		
+//		if(sonarSweepImageBuffer == null) {
+//			sonarSweepImageBuffer = new BufferedImage(swipeWidth, areaH ,BufferedImage.TYPE_INT_ARGB);
+//			Graphics newg = sonarSweepImageBuffer.getGraphics();
+//			newg.drawImage(sonarSweepImage, 0, 0, swipeWidth, areaH, this);
+//		}
 		
 		// paint the background
 		g2.setColor(sonarBGColor);
@@ -252,7 +266,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	public void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_STATUSUPDATE) {
 			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
-			addSensorData(p.getLightSensorValue(), p.getLightSensorValue(), p.getSonarSensorValue(), p.getSonarSensorValue(), p.getTouchSensorValue());
+			addSensorData(p.getLightSensorValue(), p.getGroundColor(), p.getSonarSensorValue(), p.getSonarSensorRawValue(), p.getTouchSensorValue());
 		}
 	}
 	

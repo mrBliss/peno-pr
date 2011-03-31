@@ -206,7 +206,7 @@ public class RobotBTGWConfigurator {
 				boolean value = ((BTGWPacketConfigBoolean) packet).getValue();
 				
 				Configurable configurable = (Configurable) RobotBTGWConfigurator.boolIdMap.get(id);
-				configurable.setConfigurableBoolean(id, value);
+				if(configurable != null) configurable.setConfigurableBoolean(id, value);
 			}
 		});
 		
@@ -218,7 +218,7 @@ public class RobotBTGWConfigurator {
 				int value = ((BTGWPacketConfigInteger) packet).getValue();
 				
 				Configurable configurable = (Configurable) RobotBTGWConfigurator.intIdMap.get(id);
-				configurable.setConfigurableInt(id, value);				
+				if(configurable != null) configurable.setConfigurableInt(id, value);				
 			}
 		});
 
@@ -230,7 +230,7 @@ public class RobotBTGWConfigurator {
 			float value = ((BTGWPacketConfigFloat) packet).getValue();
 		
 			Configurable configurable = (Configurable) RobotBTGWConfigurator.floatIdMap.get(id);
-			configurable.setConfigurableFloat(id, value);			
+			if(configurable != null) configurable.setConfigurableFloat(id, value);			
 		}
 	});
 		

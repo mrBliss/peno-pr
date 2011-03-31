@@ -11,7 +11,7 @@ public class GUIStandAloneFrame extends JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
         add(child);
-        setPreferredSize(new Dimension(300, 300));
+        setMinimumSize(new Dimension(600, 400));
         
         pack();
 		setVisible(true);

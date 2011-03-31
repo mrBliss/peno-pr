@@ -5,6 +5,7 @@ import geel.BTGW.packets.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -33,8 +34,12 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	
 	// sensor data
 	private final int MAX_HISTORY = 400;
+	private ArrayList<Integer> lightSensorRealValues = new ArrayList<Integer>();
+	private ArrayList<Integer> sonarSensorRealValues = new ArrayList<Integer>();
+	
 	private ArrayList<Integer> lightSensorValues = new ArrayList<Integer>();
 	private ArrayList<Integer> sonarSensorValues = new ArrayList<Integer>();
+	
 	private boolean touchSensorPressed = false;
 	
 	// panel stuff
@@ -49,6 +54,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	// sonar widget parameters	
 	private Color sonarBGColor = bgColor;
 	private Color sonarLineColor = Color.GREEN;
+	private Color sonarRealLineColor = Color.RED;
 	private int sonarTopMargin = 20;
 	private int MAXSONARVALUE = 255;
 	private int sonarCurrentValueIndicatorDiameter = 5;
@@ -106,7 +112,9 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		
 		drawCollisionIndicator(g2, 300 - collW/2, 0);
 		drawSonarWave(g2, 0,collH);
-		drawLightSensorValues(g2, 300 - lightSensorWidth / 2, collH);		
+		drawLightSensorValues(g2, 300 - lightSensorWidth / 2, collH);	
+		
+		setMinimumSize(new Dimension(300 + collW/2, 600));
 		
 	}
 	
@@ -124,6 +132,14 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 			g2.setColor(new Color(scaled,scaled,scaled));
 			g2.drawLine(tlx, y, tlx+areaW, y);
 		}
+		
+		for(int i = 0; i < lightSensorRealValues.size(); i++) {
+			int y = tly + i + lightTopMargin;
+			float scaled = (float)lightSensorRealValues.get(i).intValue() / (float)MAXLIGHTVALUE; 
+			g2.setColor(new Color(scaled,scaled,scaled));
+			g2.drawLine(tlx+areaW, y, tlx+(2*areaW), y);
+		}
+		
 	}
 	
 	private void drawSonarWave(Graphics2D g2, int tlx, int tly) {
@@ -144,9 +160,32 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		g2.setColor(sonarBGColor);
 		g2.fillRect(tlx, tly, areaW, areaH);
 		
+		// draw the real data
+		g2.setColor(sonarRealLineColor);
+		GeneralPath p = new GeneralPath();
+
+		for(int i = 0; i < sonarSensorRealValues.size(); i++) {
+			int x = areaW - sonarSensorRealValues.get(i).intValue();
+			int y = tly + i + sonarTopMargin;
+			
+			if(i/4 < sonarCurrentValueIndicatorDiameter) {
+				int diam = sonarCurrentValueIndicatorDiameter - i/4;
+			g2.fillOval(x - diam, y - diam, 2 * diam, 2 * diam);
+			}
+			
+			if(i == 0) {
+				p.moveTo(x, y);
+			} else p.lineTo(x, y);
+		}
+		
+		Stroke currentStroke = g2.getStroke();
+		g2.setStroke(new BasicStroke(3));
+		g2.draw(p);
+		g2.setStroke(currentStroke);
+
 		// draw the data
 		g2.setColor(sonarLineColor);
-		GeneralPath p = new GeneralPath();
+		p = new GeneralPath();
 
 		for(int i = 0; i < sonarSensorValues.size(); i++) {
 			int x = areaW - sonarSensorValues.get(i).intValue();
@@ -162,7 +201,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 			} else p.lineTo(x, y);
 		}
 		
-		Stroke currentStroke = g2.getStroke();
+		currentStroke = g2.getStroke();
 		g2.setStroke(new BasicStroke(3));
 		g2.draw(p);
 		g2.setStroke(currentStroke);
@@ -213,21 +252,26 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	public void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_STATUSUPDATE) {
 			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
-			addSensorData(p.getLightSensorValue(), p.getSonarSensorValue(), p.getTouchSensorValue());
+			addSensorData(p.getLightSensorValue(), p.getLightSensorValue(), p.getSonarSensorValue(), p.getSonarSensorValue(), p.getTouchSensorValue());
 		}
 	}
 	
-	private void addSensorData(int _lightSensorValue, int _sonarSensorValue, boolean _touchSensorPressed) {		
+	private void addSensorData(int _lightSensorValue, int _lightSensorRealValue, int _sonarSensorValue, int _sonarSensorRealValue, boolean _touchSensorPressed) {		
 		// register values
 		touchSensorPressed = _touchSensorPressed;
 		lightSensorValues.add(0, new Integer(_lightSensorValue));
 		sonarSensorValues.add(0, new Integer(_sonarSensorValue));
+		lightSensorRealValues.add(0, new Integer(_lightSensorRealValue));
+		sonarSensorRealValues.add(0, new Integer(_sonarSensorRealValue));
 		
-		System.out.println("Added LS="+_lightSensorValue+" SS="+_sonarSensorValue+" TS="+_touchSensorPressed);
+		//System.out.println("Added LS="+_lightSensorValue+" SS="+_sonarSensorValue+" TS="+_touchSensorPressed);
 		
 		// cap at max length
 		for(int i = lightSensorValues.size() - 1; i >= MAX_HISTORY; i--) lightSensorValues.remove(i);
 		for(int i = sonarSensorValues.size() - 1; i >= MAX_HISTORY; i--) sonarSensorValues.remove(i);
+		for(int i = lightSensorRealValues.size() - 1; i >= MAX_HISTORY; i--) lightSensorRealValues.remove(i);
+		for(int i = sonarSensorRealValues.size() - 1; i >= MAX_HISTORY; i--) sonarSensorRealValues.remove(i);
+		
 		
 		repaint();
 	}

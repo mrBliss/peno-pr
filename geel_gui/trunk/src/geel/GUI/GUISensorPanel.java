@@ -76,24 +76,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	    touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
 	    touchSensorNotPressedImage = Toolkit.getDefaultToolkit().getImage("images/nocollision.png");
 	        
-//		Thread t = new Thread() {
-//			public void run() {
-//				while(true) {
-//					sonarTick+=sonarSpeed;
-//					
-//					double someval = Math.abs(Math.sin(sonarTick / 100.0) * 100.0);
-//					addSensorData((int)someval, (int)someval, (sonarTick % 100 > 50));
-//					
-//					try {
-//						sleep(10);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		};
-//		t.start();
+
 	    
 	    if(BTGateway.getInstance() != null)
 	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_STATUSUPDATE, this);
@@ -127,14 +110,14 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		g2.fillRect(tlx, tly, areaW, areaH);
 		
 		// the data
-		for(int i = 0; i < lightSensorValues.size(); i++) {
+		for(int i = 0; i < lightSensorRealValues.size(); i++) {
 			int y = tly + i + lightTopMargin;
-			float scaled = (float)lightSensorValues.get(i).intValue() / (float)MAXLIGHTVALUE; 
+			float scaled = (float)lightSensorRealValues.get(i).intValue() / (float)MAXLIGHTVALUE; 
 			g2.setColor(new Color(scaled,scaled,scaled));
 			g2.drawLine(tlx, y, tlx+areaW, y);
 		}
 		
-		for(int i = 0; i < lightSensorRealValues.size(); i++) {
+		for(int i = 0; i < lightSensorValues.size(); i++) {
 			int y = tly + i + lightTopMargin;
 			
 			switch(lightSensorValues.get(i).intValue()) {
@@ -266,11 +249,11 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	public void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_STATUSUPDATE) {
 			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
-			addSensorData(p.getLightSensorValue(), p.getGroundColor(), p.getSonarSensorValue(), p.getSonarSensorRawValue(), p.getTouchSensorValue());
+			addSensorData(p.getGroundColor(), p.getLightSensorValue(), p.getSonarSensorValue(), p.getSonarSensorRawValue(), p.getTouchSensorValue());
 		}
 	}
 	
-	private void addSensorData(int _lightSensorValue, int _lightSensorRealValue, int _sonarSensorValue, int _sonarSensorRealValue, boolean _touchSensorPressed) {		
+	public void addSensorData(int _lightSensorValue, int _lightSensorRealValue, int _sonarSensorValue, int _sonarSensorRealValue, boolean _touchSensorPressed) {		
 		// register values
 		touchSensorPressed = _touchSensorPressed;
 		lightSensorValues.add(0, new Integer(_lightSensorValue));
@@ -288,5 +271,34 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		
 		
 		repaint();
+	}
+	
+	public static void main(String[] args) {
+		final GUISensorPanel p = new GUISensorPanel();
+		
+		Thread t = new Thread() {
+			public void run() {
+				int counter = 0;
+				while(true) {				
+					int someval = (int)Math.abs(Math.sin(counter / 100.0) * 100.0);
+					int someval2 = 0;
+					if(someval > 33) someval2 = 1;
+					if(someval > 66) someval2 = 2;
+					
+					p.addSensorData(someval2, someval * 10, someval, someval + 10, (counter % 100 > 50));
+					counter++;
+					
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
+		
+		new GUIStandAloneFrame(p, "Testing sensorpanel");
 	}
 }

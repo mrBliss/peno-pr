@@ -220,10 +220,8 @@ public class GUIConnectPanel extends JPanel {
         BTGateway btgw = new BTGateway(btgwconn);
         BTGateway.addInstance(btgw);
         
-        new GUIStandAloneFrame(new GUISensorPanel(), "Robot sensor data");
-        new GUIStandAloneFrame(new GUIConfigurationPanel(), "Configuration values");
-        new GUIStandAloneFrame(new GUIColorConfigurationPanel(), "Lightsensor calibrator");
-        new GUIStandAloneFrame(new GUISteerPanel(), "Steering panel");
+        new GUIStandAloneFrame(new GUIMainControlPanel(), "P&O Demo Control Window");
+        new GUIStandAloneFrame(new GUIMainConfigPanel(), "P&O Demo Configuration Window");
         
         return true;
 	}

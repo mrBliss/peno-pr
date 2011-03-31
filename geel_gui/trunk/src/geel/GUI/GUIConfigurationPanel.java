@@ -84,16 +84,6 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    //myBooleanTable.setBorder(BorderFactory.createTitledBorder("Booleans"));
 
 	    
-	    
-	    configIntegerValues.put("Hello", Integer.toString(123));
-	    configIntegerValues.put("World", Integer.toString(456));
-	    
-	    configBooleanValues.put("Testbool1", Boolean.toString(new Boolean(true)));
-	    configBooleanValues.put("Testbool2", Boolean.toString(new Boolean(false)));
-	    
-	    configFloatValues.put("Testfloat1", Float.toString(12.34f));
-	    configFloatValues.put("Testfloat2", Float.toString(-56.78f));
-	    
 	    updateGUITable();
 	    
 	    add(myIntegerTable);
@@ -148,6 +138,8 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    
 	    add(buttonPane, BorderLayout.PAGE_END);
 	    
+	    setMinimumSize(new Dimension(200, 100));
+	    setPreferredSize(new Dimension(200, 200));
 	    
 	}
 	

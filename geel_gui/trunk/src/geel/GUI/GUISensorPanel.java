@@ -68,6 +68,12 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	public GUISensorPanel() {
 		touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
 	    touchSensorNotPressedImage = Toolkit.getDefaultToolkit().getImage("images/nocollision.png");
+
+		int collW = touchSensorPressedImage.getWidth(null);
+		int collH = touchSensorPressedImage.getHeight(null);
+
+		setMinimumSize(new Dimension(450, 600));
+		setPreferredSize(new Dimension(450, 600));		
 	        	    
 	    if(BTGateway.getInstance() != null)
 	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_STATUSUPDATE, this);
@@ -88,9 +94,6 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		drawCollisionIndicator(g2, 300 - collW/2, 0);
 		drawSonarWave(g2, 0,collH);
 		drawLightSensorValues(g2, 300 - lightSensorWidth / 2, collH);	
-		
-		setMinimumSize(new Dimension(300 + collW/2, 600));
-		
 	}
 	
 	private void drawLightSensorValues(Graphics2D g2, int tlx, int tly) {

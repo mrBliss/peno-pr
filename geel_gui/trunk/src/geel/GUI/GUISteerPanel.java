@@ -15,6 +15,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.geom.GeneralPath;
@@ -35,7 +37,7 @@ import javax.swing.JPanel;
  *
  */
 
-public class GUISteerPanel extends JPanel implements FocusListener, KeyListener {
+public class GUISteerPanel extends JPanel implements FocusListener, KeyListener, MouseListener {
 
 	private static final long serialVersionUID = 7164671065144321970L;
 	private boolean inFocus = false;
@@ -68,6 +70,7 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 		setFocusable(true);
 		addKeyListener(this);
 		addFocusListener(this);
+		addMouseListener(this);
 		
 		Thread steerThread = new Thread() {
 			public void run() {
@@ -132,6 +135,9 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 			}
 		};
 		steerThread.start();
+		
+		setMinimumSize(new Dimension(150, 150));
+		setPreferredSize(new Dimension(150, 150));
 	}
 
 	@Override
@@ -214,4 +220,17 @@ public class GUISteerPanel extends JPanel implements FocusListener, KeyListener 
 		if(BTGateway.getInstance() != null) BTGateway.getInstance().sendPacket(new BTGWPacketManualOverride(false));
 		repaint();
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if(inFocus)
+			transferFocus();
+		else 
+			requestFocus();
+	}
+	
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e){}
 }

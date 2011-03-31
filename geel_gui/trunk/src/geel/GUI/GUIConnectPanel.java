@@ -165,41 +165,6 @@ public class GUIConnectPanel extends JPanel {
         //bottomHalf.setMinimumSize(new Dimension(400, 50));
         bottomHalf.setPreferredSize(new Dimension(600, 135));
         splitPane.add(bottomHalf);
-
-        
-        
-        
-		
-		//updateRobotList();
-		
-//		System.exit(0);
-//		
-//    	BTGWConnection btgwconn = new BTGWRealConnectionMaker("WallE", "00:16:53:02:F7:9D");
-//
-//        /* connect to it */
-//        btgwconn.connect();
-//        /* wait untill we are connected */
-//        while(btgwconn.getStatus() != BTGWConnection.STATUS_CONNECTED) {
-//                //System.out.println("Not connected. Sleeping...");
-//                try {
-//                        Thread.sleep(200);
-//                } catch (InterruptedException e) {
-//                        // TODO Auto-generated catch block
-//                        e.printStackTrace();
-//                }
-//
-//        }
-//
-//        
-//        
-//        System.out.println("connected");
-//        /* create a gateway */
-//        BTGateway btgw = new BTGateway(btgwconn);
-//        BTGateway.addInstance(btgw);
-//        
-//        new GUIStandAloneFrame(new GUISensorPanel(), "Robot sensor data");
-//        new GUIStandAloneFrame(new GUIConfigurationPanel(), "Configuration values");
-//        new GUIStandAloneFrame(new GUIColorConfigurationPanel(), "Lightsensor calibrator");
 	}
 	
 	protected boolean connectToRobot() {
@@ -240,7 +205,8 @@ public class GUIConnectPanel extends JPanel {
         new GUIStandAloneFrame(new GUISensorPanel(), "Robot sensor data");
         new GUIStandAloneFrame(new GUIConfigurationPanel(), "Configuration values");
         new GUIStandAloneFrame(new GUIColorConfigurationPanel(), "Lightsensor calibrator");
-
+        new GUIStandAloneFrame(new GUISteerPanel(), "Steering panel");
+        
         return true;
 	}
 

@@ -144,7 +144,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 				lightButton.setLabel(lightOn ? "Light off" : "Light On");
 			}
 		});
-	    buttonPane.add(lightButton);
+	    //buttonPane.add(lightButton);
 	    
 	    add(buttonPane, BorderLayout.PAGE_END);
 	    
@@ -225,6 +225,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		configBooleanValues.clear();
 		configFloatValues.clear();
 		configIntegerValues.clear();
+		updateGUITable();
 		// submit request		
 		BTGateway.getInstance().sendPacket(new BTGWPacketConfigRequest());
 		
@@ -271,7 +272,8 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	public void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGBOOLEAN) {
 			BTGWPacketConfigBoolean p = (BTGWPacketConfigBoolean) packet;
-			configBooleanValues.put(p.getKey(), p.getValue());
+			configBooleanValues.put(p.getKey(), p.getValue());			
+			System.out.println("Received boolean config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
 		}
@@ -279,6 +281,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGFLOAT) {
 			BTGWPacketConfigFloat p = (BTGWPacketConfigFloat) packet;
 			configFloatValues.put(p.getKey(), p.getValue());
+			System.out.println("Received float config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
 		}
@@ -286,6 +289,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		if(packet.getCommandCode() == BTGWPacket.CMD_CONFIGINTEGER) {
 			BTGWPacketConfigInteger p = (BTGWPacketConfigInteger) packet;
 			configIntegerValues.put(p.getKey(), p.getValue());
+			System.out.println("Received integer config "+p.getKey()+ " = " +p.getValue());
 			
 			updateGUITable();
 		}

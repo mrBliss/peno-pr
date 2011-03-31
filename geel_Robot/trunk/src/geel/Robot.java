@@ -93,7 +93,7 @@ public class Robot {
         	new ForwardBehavior(speed, motorRight, motorLeft),
         	new BarcodeBehavior(light, speed, motorRight, motorLeft),
         	new MuurvolgerBehavior(sonar, speed, motorRight, motorLeft),
-        	new TouchBehavior(touch, speed, motorRight, motorLeft, RobotSpecs.sonarPointsLeft),
+        	new TouchBehavior(touch, speed, motorRight, motorLeft),
         	new ArcBehavior(speed, motorRight, motorLeft, RobotSpecs.sonarPointsLeft),
         	new Manual(motorRight, motorLeft),
         };

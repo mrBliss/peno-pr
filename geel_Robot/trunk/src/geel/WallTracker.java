@@ -18,12 +18,12 @@ public class WallTracker {
 	/*
 	 * references to robot sensory input classes
 	 */
-	private static UltrasonicSensor sonar = new UltrasonicSensor(
-			RobotSpecs.sonarSensorPort);
-	private static LightSensor light = new LightSensor(
-			RobotSpecs.lightSensorPort, true);
-	private static TouchSensor touch = new TouchSensor(
-			RobotSpecs.touchSensorFrontPort);
+	private static UltrasonicSensor sonar = 
+		new UltrasonicSensor(RobotSpecs.sonarSensorPort);
+	private static LightSensor light = 
+		new LightSensor(RobotSpecs.lightSensorPort, true);
+	private static TouchSensor touch = 
+		new TouchSensor(RobotSpecs.touchSensorFrontPort);
 
 	/*
 	 * references to robot left and right motor classes
@@ -39,17 +39,18 @@ public class WallTracker {
 		initilizeBTGateWay();
 
 		addBackgroundListeners();
+		
 
 		// start a thread that periodically sends the sensory data
 		Thread dataLogger = new Thread() {
 			public void run() {
 				while (true) {
 					int _sonar = WallTracker.sonar.getDistance();
-					int _light = WallTracker.light.getLightValue();
+					int _light = WallTracker.light.readNormalizedValue();
 					boolean _touch = WallTracker.touch.isPressed();
 
 					BTGateway.getInstance().sendPacket(
-							new BTGWPacketStatusUpdate(_light, _sonar, _touch));
+							new BTGWPacketStatusUpdate(TrackSpecs.WHITE_COLOR,_light, _sonar,_sonar, _touch));
 					try {
 						sleep(100);
 					} catch (InterruptedException e) {
@@ -76,18 +77,21 @@ public class WallTracker {
 		(new Arbitrator(bArray)).start();
 	}
 
-	/*
-	 * when receiving a ping command: 
-	 *  1) print 'ping pong' to sysout 
-	 *  2) reply with a pong command
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * geel.BTGW.infrastructure.IBTGWCommandListener#handlePacket(geel.BTGW.
-	 * packets.BTGWPacket)
+	/**
+	 * add background listerners to the BTGateway
 	 */
 	private static void addBackgroundListeners() {
+		/*
+		 * when receiving a PING command: 
+		 *  1) print 'ping pong' to sysout 
+		 *  2) reply with a pong command
+		 * 
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * geel.BTGW.infrastructure.IBTGWCommandListener#handlePacket(geel.BTGW.
+		 * packets.BTGWPacket)
+		 */
 		BTGateway.getInstance().addListener(BTGWPacket.CMD_PING,
 				new IBTGWCommandListener() {
 
@@ -103,6 +107,9 @@ public class WallTracker {
 					}
 				});
 		
+		/*
+		 * kill robot program when DIE command is received
+		 */
 		BTGateway.getInstance().addListener(BTGWPacket.CMD_DIE,
 				new IBTGWCommandListener() {
 
@@ -121,6 +128,9 @@ public class WallTracker {
 					}
 				});
 		
+		/*
+		 * todo: what does this do??? 
+		 */
 		IBTGWCommandListener lightOperator = new IBTGWCommandListener() {
 					@Override
 					public void handlePacket(BTGWPacket packet) {

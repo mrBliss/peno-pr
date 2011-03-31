@@ -60,24 +60,15 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private int MAXSONARVALUE = 255;
 	private int sonarCurrentValueIndicatorDiameter = 5;
 	
-	// sonar animation stuff
-	private int sonarTick = 0;
-	private int sonarSpeed = 2;
-	private Image sonarSweepImage;
-	private BufferedImage sonarSweepImageBuffer;
-	
 	// touch sensor widget
 	private Image touchSensorPressedImage;
 	private Image touchSensorNotPressedImage;
 	
 	
 	public GUISensorPanel() {
-	    sonarSweepImage = Toolkit.getDefaultToolkit().getImage("images/swipe.png");
-	    touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
+		touchSensorPressedImage = Toolkit.getDefaultToolkit().getImage("images/collision.png");
 	    touchSensorNotPressedImage = Toolkit.getDefaultToolkit().getImage("images/nocollision.png");
-	        
-
-	    
+	        	    
 	    if(BTGateway.getInstance() != null)
 	    	BTGateway.getInstance().addListener(BTGWPacket.CMD_STATUSUPDATE, this);
 	}
@@ -142,16 +133,6 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 	private void drawSonarWave(Graphics2D g2, int tlx, int tly) {
 		int areaW = MAXSONARVALUE;
 		int areaH = MAX_HISTORY;
-//		int swipeWidth = sonarSweepImage.getWidth(this);
-		
-//		if(swipeWidth < 0)
-//			return;
-//		
-//		if(sonarSweepImageBuffer == null) {
-//			sonarSweepImageBuffer = new BufferedImage(swipeWidth, areaH ,BufferedImage.TYPE_INT_ARGB);
-//			Graphics newg = sonarSweepImageBuffer.getGraphics();
-//			newg.drawImage(sonarSweepImage, 0, 0, swipeWidth, areaH, this);
-//		}
 		
 		// paint the background
 		g2.setColor(sonarBGColor);
@@ -202,42 +183,9 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		g2.setStroke(new BasicStroke(3));
 		g2.draw(p);
 		g2.setStroke(currentStroke);
-
-		
-//		// draw the animated sweep
-//		int swipeX = tlx + areaW - (sonarTick % areaW);
-//		int swipeY = tly;
-//		int swipeW = Math.min(sonarTick % areaW, swipeWidth); 
-//		int swipeH = areaH;
-//				
-//		if(swipeW > 0) {
-//			BufferedImage piece = sonarSweepImageBuffer.getSubimage(0, 0, swipeW, swipeH);
-//			g2.drawImage(piece, swipeX,swipeY, this);
-//		}
 	}
 	
 	private void drawCollisionIndicator(Graphics2D g2, int topleftX, int topleftY) {
-//		int a = 20;
-//		int b = 100;
-//		
-//		if(touchSensorPressed) {
-//			g2.setColor(Color.RED);
-//		} else {
-//			g2.setColor(Color.BLUE);
-//		}
-//		
-//		GeneralPath p = new GeneralPath();
-//		p.moveTo(topleftX, topleftY + a);
-//		p.lineTo(topleftX + a, topleftY);
-//		p.lineTo(topleftX + a + b, topleftY);
-//		p.lineTo(topleftX + a + b + a, topleftY + a);
-//		p.lineTo(topleftX + a + b, topleftY + a + a);
-//		p.lineTo(topleftX + a + b - a, topleftY + a);
-//		p.lineTo(topleftX + a + a, topleftY + a);
-//		p.lineTo(topleftX + a, topleftY + a + a);
-//		p.closePath();
-//		g2.fill(p);
-		
 		if(touchSensorPressed) {
 			g2.drawImage(touchSensorPressedImage, topleftX, topleftY, this);
 		} else {
@@ -253,7 +201,7 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 		}
 	}
 	
-	public void addSensorData(int _lightSensorValue, int _lightSensorRealValue, int _sonarSensorValue, int _sonarSensorRealValue, boolean _touchSensorPressed) {		
+	private void addSensorData(int _lightSensorValue, int _lightSensorRealValue, int _sonarSensorValue, int _sonarSensorRealValue, boolean _touchSensorPressed) {		
 		// register values
 		touchSensorPressed = _touchSensorPressed;
 		lightSensorValues.add(0, new Integer(_lightSensorValue));
@@ -285,9 +233,11 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 					if(someval > 33) someval2 = 1;
 					if(someval > 66) someval2 = 2;
 					
-					p.addSensorData(someval2, someval * 10, someval, someval + 10, (counter % 100 > 50));
-					counter++;
+					BTGWPacketStatusUpdate pack = new BTGWPacketStatusUpdate(someval2, someval * 10, someval, someval + 10, (counter % 100 > 50));
+					p.handlePacket(pack);
 					
+					counter++;
+										
 					try {
 						sleep(10);
 					} catch (InterruptedException e) {

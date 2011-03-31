@@ -232,4 +232,31 @@ public class GUIColorConfigurationPanel extends JPanel implements IBTGWCommandLi
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 
+	
+	public static void main(String[] args) {
+		final GUIColorConfigurationPanel p = new GUIColorConfigurationPanel();
+		
+		Thread t = new Thread() {
+			public void run() {
+				int counter = 0;
+				while(true) {				
+					int someval = (int)Math.abs(Math.sin(counter / 100.0) * 1023.0);
+					BTGWPacketStatusUpdate pack = new BTGWPacketStatusUpdate(0,someval,0,0,false);
+					p.handlePacket(pack);
+					counter++;
+					
+					try {
+						sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
+		
+		new GUIStandAloneFrame(p, "Testing colorconfigpanel");
+	}
+	
 }

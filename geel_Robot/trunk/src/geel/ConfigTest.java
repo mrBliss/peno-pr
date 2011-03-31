@@ -1,5 +1,6 @@
 package geel;
 
+import lejos.nxt.Button;
 import geel.BTGW.infrastructure.BTGWConnection;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.robot.BTGWRealConnectionTaker;
@@ -22,6 +23,14 @@ public class ConfigTest {
 		RobotBTGWConfigurator.registerWithBTGW();
 		
 		RobotBTGWConfigurator.register(new BogusConfigurableObject());
+		RobotBTGWConfigurator.register(new BogusConfigurableObject2());
+		
+		
+		//block till escape is pressed
+		Button.ESCAPE.waitForPress();
+		
+		//forcibly kill program
+		System.exit(0);
 		
 	}
 
@@ -147,5 +156,74 @@ public class ConfigTest {
 			}
 		}
 	};
+	
+private static class BogusConfigurableObject2 implements Configurable {
+		
+		
+		private final String testFloatId = "bogusFloat";
+		private float testFloat = 0;
+		
+		@Override
+		public void setConfigurableInt(String id, int value)
+				throws IllegalArgumentException {
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+			
+		}
+		
+		@Override
+		public void setConfigurableFloat(String id, float value)
+				throws IllegalArgumentException {
+			if(id.equals(testFloatId)){
+				this.testFloat = value;
+			}else{
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+			}
+			
+		}
+		
+		@Override
+		public void setConfigurableBoolean(String id, boolean value)
+				throws IllegalArgumentException {
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+			
+		}
+		
+		@Override
+		public String[] listConfigurableIntegers() {
+			return new String[]{};
+		}
+		
+		@Override
+		public String[] listConfigurableFloat() {
+			return new String[]{testFloatId};
+		}
+		
+		@Override
+		public String[] listConfigurableBooleans() {
+			return new String[]{};
+		}
+		
+		@Override
+		public int getConfigurableInt(String id) throws IllegalArgumentException {
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+		}
+		
+		@Override
+		public float getConfigurableFloat(String id)
+				throws IllegalArgumentException {
+			if(id.equals(testFloatId)){
+				return this.testFloat;
+			}else{
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+			}
+		}
+		
+		@Override
+		public boolean getConfigurableBoolean(String id)
+				throws IllegalArgumentException {
+				throw new IllegalArgumentException("parameter '"+id+"' doesn't exists");
+		}
+	}
+
 
 }

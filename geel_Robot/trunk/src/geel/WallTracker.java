@@ -117,11 +117,7 @@ public class WallTracker {
 					public void handlePacket(BTGWPacket packet) {
 						if (packet.getCommandCode() == BTGWPacket.CMD_DIE) {
 							System.out.println("Harakiri request!");
-							try {
-								BTGateway.getInstance().sendPacket(new BTGWPacketMessage("Shutting down"));
-								BTGateway.getInstance().close();
-							} catch (IOException e) {
-							}
+							// die fucker die 
 							System.exit(0);
 						}
 

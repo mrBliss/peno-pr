@@ -342,8 +342,10 @@ public class MuurvolgerBehavior implements Behavior {
 	 */
 	private boolean isOpenSpaceDetected() {
 		//fixme: put this is seperate bahaviour?
-		return openSpaceCounter > openSpaceCounterThreshold;
+//		return openSpaceCounter > openSpaceCounterThreshold;
+		return false;
 	}
+	
 
     /**
      * used by the arbitrator to suppress this behaviour

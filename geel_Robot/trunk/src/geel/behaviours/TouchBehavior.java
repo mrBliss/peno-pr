@@ -18,7 +18,6 @@ public class TouchBehavior implements Behavior {
 
 	private TouchSensor touch;
 	
-	private int speed;
 	private RMotor motorLeft, motorRight;
 
 
@@ -28,19 +27,26 @@ public class TouchBehavior implements Behavior {
 	 * @param motorRight 
 	 * 
 	 */
-	public TouchBehavior(TouchSensor touch, int speed, RMotor motorRight, RMotor motorLeft) {
+	public TouchBehavior(TouchSensor touch, RMotor motorRight, RMotor motorLeft) {
 		this.touch = touch;
-		this.speed = speed;
 		this.motorLeft = motorLeft;
 		this.motorRight = motorRight;
 	}
 
+	/**
+	 * move backward and turn to the side in which the sonar is not pointing
+	 * 
+	 *  (non-Javadoc)
+	 * @see lejos.robotics.subsumption.Behavior#action()
+	 */
 	@Override
 	public void action() {
 		
+		//todo: magic numbers
 		
-		motorLeft.setSpeed(speed);
-		motorRight.setSpeed(speed);
+		
+		motorLeft.setSpeed(900);
+		motorRight.setSpeed(900);
 		
 		motorLeft.backward();
 		motorRight.backward();

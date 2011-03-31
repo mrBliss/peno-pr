@@ -119,7 +119,7 @@ public class MuurvolgerBehavior implements Behavior {
      * @param speed
      * @param turnSpeed
      */
-    public MuurvolgerBehavior(UltrasonicSensor ultra, int speed, Motor motorRight, Motor motorLeft) {
+    public MuurvolgerBehavior(UltrasonicSensor ultra, Motor motorRight, Motor motorLeft) {
         this.ultra = ultra;
         this.motorLeft = motorLeft;
         this.motorRight = motorRight;

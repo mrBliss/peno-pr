@@ -67,8 +67,8 @@ public class WallTracker {
 		 * lowest to highest behavior priority
 		 */
 		Behavior[] bArray = new Behavior[] {
-				new MuurvolgerBehavior(sonar,speed, motorRight, motorLeft),
-				new TouchBehavior(touch, speed, motorRight, motorLeft)
+				new MuurvolgerBehavior(sonar, motorRight, motorLeft),
+				new TouchBehavior(touch, motorRight, motorLeft)
 			};
 
 		/* instantiate an arbitrator */

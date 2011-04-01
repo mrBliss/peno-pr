@@ -1,13 +1,21 @@
 package geel;
 
 /**
- * this interface indicated that a class is configurable through the Bluetooth Gateway.
+ * This interface indicates that a class is has configurable parameters.
+ * Such configurable parameters are either booleans, integers or floats and are
+ * identified by a string ID which must be unique.
  * 
- * every configurable class must implement 3 basic operations for each type,
- * configurable booleans, integers and floats, namely: 
- *  + void set(id,value)
- *  + <type> get(id)
- *  + String[] list() operation that list all parameter id's the configurable parameters of that type
+ * every configurable class implement 3 basic operations for each type: 
+ *  + a setter to set the value of a parameter,
+ *  + a getter to get the value of a parameter and
+ *  + a list operation to list all parameter id's of that type.
+ *  
+ *  To ensure that configuration attempts can not be silently ignored,
+ *  setting or getting of a parameter ID that is not recognized must results in an 
+ *  {@link IllegalArgumentException}. 
+ *  
+ *  The setter may also throw an {@link IllegalArgumentException} if the value to be 
+ *  set is not valid for some reason.
  * 
  * @author jeroendv
  *

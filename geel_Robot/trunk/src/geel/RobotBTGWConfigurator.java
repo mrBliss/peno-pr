@@ -1,9 +1,5 @@
 package geel;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.infrastructure.IBTGWCommandListener;
 import geel.BTGW.packets.BTGWPacket;
@@ -12,6 +8,9 @@ import geel.BTGW.packets.BTGWPacketConfigFloat;
 import geel.BTGW.packets.BTGWPacketConfigInteger;
 import geel.BTGW.packets.BTGWPacketConfigRequest;
 import geel.BTGW.packets.BTGWPacketMessage;
+
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 /**
  * This class allows centralized configuration of multiple configurable object over 

@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class BTGWPacketStatusUpdate extends BTGWPacket {
+	private long timestamp;
+	
 	private int groundColor;
 	private int lightSensorValue;
 	
@@ -63,8 +65,18 @@ public class BTGWPacketStatusUpdate extends BTGWPacket {
 		setCommandCode(CMD_STATUSUPDATE);
 	}
 	
+	
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	private void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public BTGWPacketStatusUpdate(int groundColor, int light, int rawSonar,int sonar, boolean touch) {
 		this();
+		setTimestamp(System.currentTimeMillis());
 		setGroundColor(groundColor);
 		setLightSensorValue(light);
 		setSonarSensorRawValue(rawSonar);
@@ -75,6 +87,7 @@ public class BTGWPacketStatusUpdate extends BTGWPacket {
 	public void transmit(DataOutputStream output) throws IOException {
 		super.transmit(output);
 		
+		output.writeLong(getTimestamp());
 		output.writeInt(getGroundColor());
 		output.writeInt(getLightSensorValue());
 		output.writeInt(getSonarSensorRawValue());
@@ -84,6 +97,7 @@ public class BTGWPacketStatusUpdate extends BTGWPacket {
 	
 	public void receive(DataInputStream input) throws IOException {
 		super.receive(input);
+		setTimestamp(input.readLong());
 		setGroundColor(input.readInt());
 		setLightSensorValue(input.readInt());
 		setSonarSensorRawValue(input.readInt());

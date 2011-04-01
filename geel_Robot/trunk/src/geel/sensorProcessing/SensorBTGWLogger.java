@@ -115,7 +115,7 @@ public class SensorBTGWLogger {
 	/**
 	 * Send a {@link BTGWPacketStatusUpdate} if all sensors are updated
 	 */
-	private void sendStatusUpdate(){
+	private synchronized void sendStatusUpdate(){
 		if(	this.updatedColor && 
 			this.updatedLightValue && 
 			this.updatedProcessedSonarValue && 

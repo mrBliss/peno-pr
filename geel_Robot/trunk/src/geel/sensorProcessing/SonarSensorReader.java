@@ -1,5 +1,7 @@
 package geel.sensorProcessing;
 
+import geel.RobotSpecs;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,7 +48,7 @@ public class SonarSensorReader implements SensorDataProducer {
 	/**
 	 * the sample period in millisecond 
 	 */
-	private int samplePeriod = 100;
+	private int samplePeriod = RobotSpecs.defaultSamplePeriod;
 	
 	/**
 	 * the timestamp of the most recent sample

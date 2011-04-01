@@ -59,6 +59,12 @@ public class RobotSpecs {
     
     
     private static final int mm2cm = 10;
+
+
+	/**
+	 * default sample period in milli seconds
+	 */
+	public static final int defaultSamplePeriod = 100;
     
     
     

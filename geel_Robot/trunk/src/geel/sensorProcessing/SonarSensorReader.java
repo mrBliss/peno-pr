@@ -8,17 +8,30 @@ import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
 
 /**
- * dedicated sonar sensor data producer that reads directly form the NXT {@link SensorPort}
+ * dedicated sonar sensor data poller.
+ * A {@link SonarSensorReader} object is the root of a producer, listeners tree and as 
+ * such drives the processing of the sonar data.
  * 
- * {@link SensorDataListener} objects can register themselves if they want to
- * receive sonar sensor data.
+ * Any object that requires sonar sensor data should implements the {@link SensorDataListener}
+ * interface and register itself with a SonarSensorReader object. It should not try to access or
+ * read the sonar sensor data in any other way.
  * 
  * the sonar sensor data is in the range [0, 255] and roughly corresponds to the distance in cm.
+ * 
+ * note that only one SonarSensorReader can be assigned to a sonar sensor.
+ * 
  * 
  * @author jeroendv
  *
  */
 public class SonarSensorReader implements SensorDataProducer {
+	
+	/**
+	 * a list of sensor ports to which a SonarSensorReader has been assigned
+	 * to prevent the creation of two {@link SonarSensorReader} for the same port.
+	 */
+	private static ArrayList<SensorPort> assignedPorts = new ArrayList<SensorPort>();
+	
 	
 	
 	/**
@@ -27,7 +40,7 @@ public class SonarSensorReader implements SensorDataProducer {
 	 */
 	private List<SensorDataListener> listeners = new ArrayList<SensorDataListener>();
 	
-	private UltrasonicSensor sonar ;
+	private UltrasonicSensor sonar;
 	
 	
 	/*
@@ -69,19 +82,29 @@ public class SonarSensorReader implements SensorDataProducer {
 	
 	
 	/**
-	 * initilize  a new {@link SonarSensorReader} on a certain SensorPort.
+	 * initilize a new {@link SonarSensorReader} on a certain SensorPort.
 	 * This constructor blocks until the sonar sensor is up and running.
 	 * 
 	 * @param port the port the sonar sensor is attached to.
+	 * 
+	 * @throw IllegalArgumentException
+	 * 	if the port already has SonarSensorReader assigned to it
 	 */
 	public SonarSensorReader(SensorPort port){
-		this.sonar = new UltrasonicSensor(port);
-		
-		this.sonar.reset();
-		//reset() blocks till sonar sensor is reset.
-		//ie. if no sonar sensor is attached to port then it will block indefinitely
-		
-		this.sonarPollingThread = null;
+		if(SonarSensorReader.assignedPorts.contains(port)){
+			throw new IllegalArgumentException("port "+port.getId()+" already has SonarSensorReader assigned to it");
+		}else{
+			SonarSensorReader.assignedPorts.add(port);
+			
+			//initialize the sonar sensor
+			this.sonar = new UltrasonicSensor(port);
+			this.sonar.reset();
+			
+			//reset() blocks till sonar sensor is reset.
+			//ie. if no sonar sensor is attached to port then it will block indefinitely
+			
+			this.stop();
+		}
 	}
 
 	@Override
@@ -129,7 +152,7 @@ public class SonarSensorReader implements SensorDataProducer {
 		this.isStopped = true;
 		
 		// wait for polling thread to cleanly exit
-		while(this.sonarPollingThread.isAlive()){
+		while(this.sonarPollingThread!= null && this.sonarPollingThread.isAlive()){
 			//give sonarPollingThread a chance to exit cleanly
 			Thread.yield();
 		}

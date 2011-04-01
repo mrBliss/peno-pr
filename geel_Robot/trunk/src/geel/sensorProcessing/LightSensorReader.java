@@ -4,22 +4,33 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lejos.nxt.ADSensorPort;
+import lejos.nxt.LightSensor;
 import lejos.nxt.SensorPort;
 import lejos.nxt.SensorPortListener;
 
 /**
- * dedicated light sensor data producer that reads directly form the NXT {@link SensorPort}
+ * dedicated light sensor data poller that reads directly from the NXT {@link SensorPort}
+ * A {@link LightSensorReader} object is the root of a producer, listeners tree and as 
+ * such drives the processing of the sonar data.
  * 
- * {@link SensorDataListener} objects can register themselves if they want to
- * receive light sensor data.
+ * Any object that requires light sensor data should implements the {@link SensorDataListener}
+ * interface and register itself with a LIghtSensorReader object. It should not try to access or
+ * read the light sensor data in any other way.
  * 
  * the light sensor data is in the range [0, 1023] where 0 means dark and 1023 means bright.
+ * 
+ * note that only one LightSensorReader can be assigned to a sonar sensor.
  * 
  * @author jeroendv
  *
  */
 public class LightSensorReader implements SensorPortListener, SensorDataProducer{
+	
+	/**
+	 * a list of sensor ports to which a LightSensorReader has been assigned
+	 * to prevent the creation of two {@link LightSensorReader} for the same port.
+	 */
+	private static ArrayList<SensorPort> assignedPorts = new ArrayList<SensorPort>();
 	
 	private boolean isStopped;
 	
@@ -32,11 +43,24 @@ public class LightSensorReader implements SensorPortListener, SensorDataProducer
 	
 	/**
 	 * initilize  a new {@link LightSensorReader} on a certain SensorPort
+	 * 
 	 * @param port the port the light sensor is attached to.
+	 * 
+	 * @throw IllegalArgumentException
+	 * 	if the port already has SonarSensorReader assigned to it
 	 */
 	public LightSensorReader(SensorPort port){
-		port.addSensorPortListener(this);
-		this.isStopped = true;
+		if(LightSensorReader.assignedPorts.contains(port)){
+			throw new IllegalArgumentException("port "+port.getId()+" already has LightSensorReader assigned to it");
+		}else{
+			LightSensorReader.assignedPorts.add(port);
+			
+			// turn on the floodlight
+			new LightSensor(port,true);
+			
+			port.addSensorPortListener(this);
+			this.isStopped = true;
+		}
 	}
 	
 	

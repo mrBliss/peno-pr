@@ -47,6 +47,14 @@ public class RobotSpecs {
     public  static SensorPort lightSensorPort = SensorPort.S1;
     public  static SensorPort touchSensorFrontPort = SensorPort.S2;
     public  static SensorPort sonarSensorPort = SensorPort.S3;
+
+
+    /** 
+     * the initial threshold values that map the light sensor values [0,1023]
+     * to black, ground or white
+     */
+	public static int blackGroundThreshold = 300;
+	public static int groundWhiteThreshold = 450;
     
     
     

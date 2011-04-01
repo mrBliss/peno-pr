@@ -6,6 +6,7 @@ import java.util.List;
 
 import lejos.nxt.SensorPort;
 import lejos.nxt.UltrasonicSensor;
+import lejos.util.Delay;
 
 /**
  * dedicated sonar sensor data poller.
@@ -42,7 +43,18 @@ public class SonarSensorReader implements SensorDataProducer {
 	
 	private UltrasonicSensor sonar;
 	
+	/**
+	 * the sample period in millisecond 
+	 */
+	private int samplePeriod = 100;
 	
+	/**
+	 * the timestamp of the most recent sample
+	 * returned by System.currentTimeMillis()
+	 */
+	private long lastSampleTimestamp = 0;
+	
+
 	/*
 	 * a Runnable task that will poll the sonar sensor as fast as possible;
 	 */
@@ -52,15 +64,22 @@ public class SonarSensorReader implements SensorDataProducer {
 		public void run() {
 			int distance;
 			while(!isStopped){
-				distance = sonar.getDistance();
-				// blocks till new sonar data is available
-				
-				/* note:
-				 * we make use of the hack in the UltrasonicSensor that limits 
-				 * the sampling frequency due to weird problems otherwise
-				 */
-				
-				informListeners(distance);
+				long timestamp = System.currentTimeMillis();
+				if(timestamp >=lastSampleTimestamp+samplePeriod){
+					distance = sonar.getDistance();
+					// blocks till new sonar data is available
+					
+					/* note:
+					 * we make use of the hack in the UltrasonicSensor that limits 
+					 * the sampling frequency due to weird problems otherwise
+					 */
+					
+					informListeners(timestamp, distance);
+				}else{
+					//ignore sample
+					
+					Delay.msDelay(lastSampleTimestamp + samplePeriod - timestamp);
+				}
 			}
 		}
 		
@@ -115,16 +134,39 @@ public class SonarSensorReader implements SensorDataProducer {
 	/**
 	 * called by SensorPollThread to inform all listeners of new data by calling 
 	 * listener.processNewSensorData(..)
+	 * @param timestamp 
 	 * 
 	 * @param aNewValue
 	 */
-	private void informListeners(int aNewValue) {
+	private void informListeners(long timestamp, int aNewValue) {
 		Iterator<SensorDataListener> it = listeners.iterator();
 		while(it.hasNext()){
 			SensorDataListener listener = it.next();
-			listener.processNewSensorData(System.currentTimeMillis(), aNewValue);
+			listener.processNewSensorData(timestamp, aNewValue);
 		}
 
+	}
+	
+	/**
+	 * @return the sample period
+	 */
+	public int getSamplePeriod() {
+		return samplePeriod;
+	}
+
+	/**
+	 * set sample period in milliseconds
+	 * 
+	 * @param samplePeriod
+	 * @throws IllegalArgumentException
+	 * 	if sampleperiod <=0
+	 */
+	private void setSamplePeriod(int samplePeriod) {
+		if(samplePeriod <= 0){
+			throw new IllegalArgumentException("sample period must be >0");
+		}
+		
+		this.samplePeriod = samplePeriod;
 	}
 	
 	/**

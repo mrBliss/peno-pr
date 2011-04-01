@@ -35,6 +35,18 @@ public class LightSensorReader implements SensorPortListener, SensorDataProducer
 	private boolean isStopped;
 	
 	/**
+	 * the sample period in millisecond 
+	 */
+	private int samplePeriod = 100;
+	
+	/**
+	 * the timestamp of the most recent sample
+	 * returned by System.currentTimeMillis()
+	 */
+	private long lastSampleTimestamp = 0;
+	
+
+	/**
 	 * list of all the sensor listeners of the light sensor
 	 * filled by addListeners(..)
 	 */
@@ -74,18 +86,47 @@ public class LightSensorReader implements SensorPortListener, SensorDataProducer
 	@Override
 	public void stateChanged(SensorPort aSource, int aOldValue, int aNewValue) {
 		if(!this.isStopped){
-			//normalization so that 0 = dark and 1023 is bright
-			int lightValue = 1023-aNewValue;
-			
-			Iterator<SensorDataListener> it = this.listeners.iterator();
-			while(it.hasNext()){
-				SensorDataListener listener = it.next();
+			long timestamp = System.currentTimeMillis();
+			if(timestamp >=(this.lastSampleTimestamp+this.samplePeriod) ){
+				this.lastSampleTimestamp = timestamp;
 				
-				listener.processNewSensorData(System.currentTimeMillis(),lightValue);
+				//normalization so that 0 = dark and 1023 is bright
+				int lightValue = 1023-aNewValue;
+				
+				Iterator<SensorDataListener> it = this.listeners.iterator();
+				while(it.hasNext()){
+					SensorDataListener listener = it.next();
+					
+					listener.processNewSensorData(timestamp,lightValue);
+				}
+			}else{
+				//ignore the new value if the sample period has not yet passed.
 			}
 		}
 	}
 	
+	/**
+	 * @return the sample period
+	 */
+	public int getSamplePeriod() {
+		return samplePeriod;
+	}
+
+
+	/**
+	 * set sample period in milliseconds
+	 * 
+	 * @param samplePeriod
+	 * @throws IllegalArgumentException
+	 * 	if sampleperiod <=0
+	 */
+	private void setSamplePeriod(int samplePeriod) {
+		if(samplePeriod <= 0){
+			throw new IllegalArgumentException("sample period must be >0");
+		}
+		
+		this.samplePeriod = samplePeriod;
+	}
 	/**
 	 * start polling the light sensor as fast as possible
 	 * multiple calls have no effect

@@ -47,6 +47,7 @@ public class SonarSensorReader implements SensorDataProducer {
 	
 	/**
 	 * the sample period in millisecond 
+	 * TODO make configurable
 	 */
 	private int samplePeriod = RobotSpecs.defaultSamplePeriod;
 	

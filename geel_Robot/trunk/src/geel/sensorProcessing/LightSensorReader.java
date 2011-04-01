@@ -38,6 +38,7 @@ public class LightSensorReader implements SensorPortListener, SensorDataProducer
 	
 	/**
 	 * the sample period in millisecond 
+	 * TODO make configurable
 	 */
 	private int samplePeriod = RobotSpecs.defaultSamplePeriod;
 	

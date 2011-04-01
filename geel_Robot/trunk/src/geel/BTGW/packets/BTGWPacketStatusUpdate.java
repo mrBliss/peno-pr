@@ -66,6 +66,10 @@ public class BTGWPacketStatusUpdate extends BTGWPacket {
 	}
 	
 	
+	/**
+	 * FIXME: use this on PC side to get a grasp of the load
+	 * @return
+	 */
 	public long getTimestamp() {
 		return timestamp;
 	}

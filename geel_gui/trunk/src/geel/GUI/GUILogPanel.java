@@ -49,6 +49,9 @@ public class GUILogPanel extends JScrollPane implements IBTGWCommandListener {
         setViewportView(output);
         output.setEditable(false);
         
+        if(BTGateway.getInstance() != null)
+        	BTGateway.getInstance().addListener(BTGWPacket.CMD_MESSAGE, this);
+        
         //for(int i = 0; i < 100; i++)
         	//output.append("["+i+"] Hello world Hello world Hello world Hello world Hello world Hello world Hello world Hello world Hello world\n");
 	}

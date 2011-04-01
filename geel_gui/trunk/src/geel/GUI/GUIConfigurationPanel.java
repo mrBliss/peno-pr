@@ -156,7 +156,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		}
 	}
 
-	public void updateGUITable() {
+	public synchronized void updateGUITable() {
 		// clear the panel first
 		myIntegerTableModel.setRowCount(0);
 		myFloatTableModel.setRowCount(0);
@@ -185,7 +185,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 	    }
 	}
 	
-	public void printFields() {
+	public synchronized void printFields() {
 		for(int i = 0; i < myIntegerTableModel.getRowCount(); i++) {
 			String key = (String)myIntegerTableModel.getValueAt(i, 0);
 			Integer value = Integer.parseInt((String)myIntegerTableModel.getValueAt(i, 1));
@@ -209,7 +209,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 
 	}
 	
-	public void submitConfigSubmissionRequest() {
+	public synchronized void submitConfigSubmissionRequest() {
 		if(BTGateway.getInstance() == null) {
 			System.out.println("Not connected yet, not sending configuration submission request.");
 			return;
@@ -227,7 +227,7 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 		System.out.println("Request sent.");
 	}
 	
-	public void submitConfiguration() {		
+	public synchronized void submitConfiguration() {		
 		if(BTGateway.getInstance() == null) {
 			System.out.println("Not connected yet, not sending configuration.");
 			return;
@@ -298,6 +298,12 @@ public class GUIConfigurationPanel extends JPanel implements IBTGWCommandListene
 			submitConfiguration();
 			return;
 		}
-
 	}
+
+	@Override
+	public synchronized void repaint() {
+		super.repaint();
+	}
+	
+	
 }

@@ -17,7 +17,7 @@
 	<property name="nxj.home" value="${nxj.home.zadeh}"/>
 
 	<!-- the main class of the program -->
-	<property name="mainClass" value="geel.WallTracker" />
+	<property name="mainClass" value="geel.ConfigTest" />
 
 	<!-- adress of the NXT brick to upload to -->
 	<property name="nxt.address" value="${nxt.address.rood}" />

@@ -5,70 +5,57 @@ import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.infrastructure.IBTGWCommandListener;
 import geel.BTGW.packets.BTGWPacket;
 import geel.BTGW.packets.BTGWPacketPong;
-import geel.BTGW.packets.BTGWPacketStatusUpdate;
 import geel.BTGW.robot.BTGWRealConnectionTaker;
 import geel.behaviours.Manual;
-import geel.behaviours.MuurvolgerBehavior;
-import geel.behaviours.TouchBehavior;
 import geel.sensorProcessing.LightColorIdentification;
 import geel.sensorProcessing.LightSensorReader;
 import geel.sensorProcessing.SensorBTGWLogger;
 import geel.sensorProcessing.SonarSensorReader;
-import lejos.nxt.LightSensor;
 import lejos.nxt.TouchSensor;
-import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
 public class BarCodeReader {
-	
-	/*
-	 * references to robot sensory input classes
-	 */
-	private static UltrasonicSensor sonar = 
-		new UltrasonicSensor(RobotSpecs.sonarSensorPort);
-	private static LightSensor light = 
-		new LightSensor(RobotSpecs.lightSensorPort, true);
-	private static TouchSensor touch = 
-		new TouchSensor(RobotSpecs.touchSensorFrontPort);
 
-	/*
-	 * references to robot left and right motor classes
-	 */
-	private static RMotor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
-	private static RMotor motorRight = new RMotor(RobotSpecs.rightMotorPort);
 	
 	
 	public static void main(String args[]) throws Exception {
-
-		// initialize BTgateway
+		
+		/*******************************************
+		 * Bluetooth Gateway initialization
+		 *******************************************/
 		initilizeBTGateWay();
 		addBackgroundBTGWListeners();
 		
 		//blocks till gateway is up and running
 		
 		
+		
+		/*******************************************
+		 * Sensor processing chain initialization
+		 *******************************************/
+		// references to robot sensory input classes
 		TouchSensor touchSensor = new TouchSensor(RobotSpecs.touchSensorFrontPort);
+		LightSensorReader lightSensorReader = new LightSensorReader(RobotSpecs.lightSensorPort);
+		SonarSensorReader sonarSensorReader = new SonarSensorReader(RobotSpecs.sonarSensorPort);
+		
 		
 		// create light sensor processing chain
-		LightSensorReader lightSensorReader = new LightSensorReader(RobotSpecs.lightSensorPort);
 		LightColorIdentification lightColorIdentification = new LightColorIdentification(lightSensorReader);
 		
-		
-		
 		// create sonar sensor processing chain
-		SonarSensorReader sonarSensorReader = new SonarSensorReader(RobotSpecs.sonarSensorPort);
 		//fixme: add the processed data producer
 		new SensorBTGWLogger(lightSensorReader,lightColorIdentification, sonarSensorReader,sonarSensorReader,touchSensor);
 		
 		
-		//add configurable classes to the configurator
-		RobotBTGWConfigurator.register(lightColorIdentification);
-		RobotBTGWConfigurator.registerWithBTGW();
 		
-		// start the light and sonar readers that drive the sensor processing chain
-		lightSensorReader.start();
-		sonarSensorReader.start();
+		
+		/*******************************************
+		 * behavior and arbitrator initialization
+		 *******************************************/
+		//references to robot left and right motor classes use by the behaviors
+		RMotor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
+		RMotor motorRight = new RMotor(RobotSpecs.rightMotorPort);
 
 		/*
 		 * instantiate an array of behaviors that will control the robot from
@@ -77,14 +64,36 @@ public class BarCodeReader {
 		Behavior[] bArray = new Behavior[] {
 				new Manual(motorRight, motorLeft),
 			};
-
-		/* instantiate an arbitrator */
-		System.out.println("program starting");
-
-		(new Arbitrator(bArray)).start();
 		
+		Arbitrator arbitrator = new Arbitrator(bArray);
+		
+		/*******************************************
+		 * RobotBTGWconfigurator initialization
+		 *******************************************/
+		RobotBTGWConfigurator.register(lightColorIdentification);
+		
+		RobotBTGWConfigurator.registerWithBTGW();
+
+		
+		
+		
+		/*******************************************
+		 * starting the Robot
+		 *******************************************/
+		System.out.println("program starting");
+		// start the light and sonar readers that drive the sensor processing chain
+		lightSensorReader.start();
+		sonarSensorReader.start();
+		
+		//start behaviour arbitrator
+		arbitrator.start();
 		//FIXME: the arbitrator never returns so only a ugly forced System.exit(0) can be used kill the program
 		
+		
+		
+		/*******************************************
+		 * stopping the Robot
+		 *******************************************/
 		// stop the light and sonar readers that drive the sensor processing chain
 		lightSensorReader.stop();
 		sonarSensorReader.stop();

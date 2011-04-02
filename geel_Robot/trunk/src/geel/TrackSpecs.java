@@ -64,42 +64,20 @@ public class TrackSpecs {
     
     //FIXME
     public static String barcodeToString(int barcode){
-    	if(0x00 == barcode){
-    		return "0000000";
-    	}else if(0x0f == barcode){
-    		return "0001111";
-    	}else if( 0x15 == barcode){
-    		return "0010110";
-    	}else if(	0x19 == barcode){
-    		return "0011001";
-    	}else if (    	0x25 == barcode){
-    		return "0100101";
-    	}else if(    	0x2A == barcode){
-    		return "0101010";
-    	}else if(   	0x33 == barcode){
-    		return "0110011";
-    	}else if(		0x3C == barcode){
-    		return "0111100";
-		}else if(		0x43 == barcode){
-			return "1000011";
-		}else if(		0x4C == barcode){
-			return "1001100";
-		}else if(		0x55 == barcode){
-			return "1010101";
-		}else if(		0x5A == barcode){
-			return "1011010";
-		}else if(		0x66 == barcode){
-			return "1100110";
-		}else if(		0x69 == barcode){
-			return "1101001";
-		}else if(		0x70 == barcode){
-			return "1110000";
-		}else if(		0x7f == barcode){
-			return "1111111";
-		}
-		else{
-			return "xxxxxxx";
-		}
+    	char[] charArray = new char[7];
+    	
+    	int mask = 0x01;
+    	for(int i =0; i < 7 ; i ++){
+    		int bitValue = barcode & mask;
+    		if(bitValue != 0){
+    			charArray[i]= '1';
+    		}else{
+    			charArray[i] = '0';
+    		}
+    		mask = mask <<1;
+    	}
+    	
+    	return new String(charArray);
     	
     }
 

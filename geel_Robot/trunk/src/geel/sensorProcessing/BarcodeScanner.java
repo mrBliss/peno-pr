@@ -76,7 +76,7 @@ public class BarcodeScanner implements SensorDataListener{
 	
 	
 	private int lastReadBarcode;
-	private long lastReadBarcodeTimeStamp;
+	private long lastReadBarcodeTimeStamp = 0;
 	
 	/*
 	 * references to the motors of the wheels to access tacho count values

@@ -12,6 +12,7 @@ import geel.behaviours.Manual;
 import geel.behaviours.MuurvolgerBehavior;
 import geel.behaviours.TouchBehavior;
 import geel.behaviours.WallTracker;
+import geel.behaviours.turnCorner;
 import geel.sensorProcessing.BarcodeScanner;
 import geel.sensorProcessing.LightColorIdentification;
 import geel.sensorProcessing.LightSensorPollSpeedCheck;
@@ -72,7 +73,8 @@ public class PrRobot {
 		 */
 		Behavior[] bArray = new Behavior[] {
 				new ForwardBehavior(rMotor, lMotor),
-				new WallTracker(sonarSensorReader,rMotor, lMotor),
+//				new WallTracker(sonarSensorReader,rMotor, lMotor),
+				new turnCorner(barcodeScanner, lMotor, rMotor),
 				new DriveStraightOnBarcode(barcodeScanner, lMotor, rMotor),
 				new TouchBehavior(touchSensor, rMotor, lMotor),
 				new Manual(rMotor, lMotor),

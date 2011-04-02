@@ -1,6 +1,8 @@
 package geel.behaviours;
 
 import geel.RobotSpecs;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.packets.BTGWPacketMessage;
 import geel.sensorProcessing.BarcodeScanner;
 import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;

@@ -43,6 +43,15 @@ public class TrackSpecs {
 		0x7f,
     };
     
+    //TODO
+	public static final int TurnRighBarcode = 0x33;
+	 //TODO
+	public static final int TurnLeftBarcode = 0x19;
+	//TODO
+	public static final int GoForwardBarcode = 0;
+	
+	
+    
     public static boolean isBarcodeValid(int barcode){
     	for(int i = 0; i >16; i++){
     		if(barcodes[i] == barcode){

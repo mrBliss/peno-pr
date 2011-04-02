@@ -26,6 +26,11 @@ public class RobotSpecs {
 	 */
 	public static int wheelDiameter = 56;
 	
+	/**
+	 * distance between the weels in cm
+	 */
+	public static int WheelBasis = 12;
+	
 	
 	/**
 	 * specify the to which side the sonar is pointed
@@ -74,6 +79,12 @@ public class RobotSpecs {
 
 
 	public static final int defaultEndBarcodeThreshold = 7;
+
+
+	public static final int defaultTurnSpeed = 300;
+
+	
+	public static final int defaultTurnRadius = 30;
     
     
     
@@ -100,6 +111,7 @@ public class RobotSpecs {
     public static float distance(int degrees){
     	return  (float) (wheelDiameter*degrees*Math.PI/(360*mm2cm));
     }
+    
     
     
 

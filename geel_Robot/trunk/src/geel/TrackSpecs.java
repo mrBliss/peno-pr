@@ -14,5 +14,11 @@ public class TrackSpecs {
      * Width of a tile in centimeter
      */
     public static final int tileWidth = 80;
+    
+    
+    /**
+     * Width of a single bit of the barcode in centimeter 
+     */
+    public static final int barcodeBitWitdth = 2;
 
 }

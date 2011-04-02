@@ -63,8 +63,11 @@ public class RobotSpecs {
 
 	/**
 	 * default sample period in milli seconds
+	 * 
+	 * This period ensures that the light sensor sample length is smaller then 2 cm
+	 * which is the width of 1 bit in the barcode
 	 */
-	public static final int defaultSamplePeriod = 100;
+	public static final int defaultSamplePeriod = 30;
     
     
     

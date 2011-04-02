@@ -48,23 +48,8 @@ import lejos.nxt.Motor;
  */
 public class BarcodeScanner implements SensorDataListener{
 	
-	/**
-	 * 
-	 * a tuple object containing a color sample and 
-	 * the travelled distance since the previous color sample
-	 * @author jeroendv
-	 *
-	 */
-	private class Tuple{
-		public int color;
-		public float distance;
-		
-		public Tuple(int color, float distance){
-			this.color = color;
-			this.distance = distance;
-		}
-		
-	}
+	private List<Integer> colorList = new ArrayList<Integer>();
+	private List<Float> distanceList = new ArrayList<Float>();
 	
 	/**
 	 * flag indicating if this scanner is detecting a barcode
@@ -80,10 +65,6 @@ public class BarcodeScanner implements SensorDataListener{
 	 */
 	private boolean invalidSampleSequence;
 	
-	/**
-	 * a buffer for the color samples in case the start of a barcode is detected
-	 */
-	private List<Tuple> colorBuffer = new ArrayList<Tuple>();
 	
 	/**
 	 * The number of consecutive brown samples after which we 
@@ -150,7 +131,8 @@ public class BarcodeScanner implements SensorDataListener{
 			}
 		}else if(this.invalidSampleSequence){
 			// barcode detection should be terminated
-			this.colorBuffer.clear();
+			this.colorList.clear();
+			this.distanceList.clear();
 			
 			this.barcodeDetected = false;
 			this.invalidSampleSequence = false;
@@ -162,7 +144,8 @@ public class BarcodeScanner implements SensorDataListener{
 			this.deriveBarcode();
 			
 			//clear buffer list
-			this.colorBuffer.clear();
+			this.colorList.clear();
+			this.distanceList.clear();
 			
 			//reset flags
 			this.barcodeDetected = false;
@@ -194,14 +177,15 @@ public class BarcodeScanner implements SensorDataListener{
 			this.consecutiveBrownSampleCounter = 0;
 			
 					
-			if( lTacho == this.lastLTachocount && rTacho == this.lastRTachocount && this.colorBuffer.size() > 0){
+			if( lTacho == this.lastLTachocount && rTacho == this.lastRTachocount && this.colorList.size() > 0){
 				// don't buffer sample values if we are standing still
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("sample not buffered because we are standing still."));
 				return;
 			}
 			
 			BTGateway.getInstance().sendPacket(new BTGWPacketMessage("new sample '"+color+"' @ "+traveledDistance+"cm"));
-			this.colorBuffer.add(new Tuple(color, traveledDistance));
+			this.colorList.add(color);
+			this.distanceList.add(traveledDistance);
 		}else{
 			//brown was sampled
 			this.consecutiveBrownSampleCounter ++;
@@ -218,7 +202,7 @@ public class BarcodeScanner implements SensorDataListener{
 	 * @param rTacho
 	 */
 	private float traveledDistance(int lTacho,int rTacho){
-		if(this.colorBuffer.size() == 0){
+		if(this.colorList.size() == 0){
 			//the first sample
 			this.initialLTachocount = lTacho;
 			this.initialRTachocount = rTacho;
@@ -246,8 +230,8 @@ public class BarcodeScanner implements SensorDataListener{
 	private void deriveBarcode(){
 		
 		
-		int bufferSize = this.colorBuffer.size();
-		float totalBarCodeLength = this.colorBuffer.get(bufferSize-1).distance;
+		int bufferSize = this.colorList.size();
+		float totalBarCodeLength = this.distanceList.get(bufferSize-1);
 		
 		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("end of barcode detected, length : "+
 				totalBarCodeLength+"cm, "+bufferSize+" samples"));
@@ -263,50 +247,58 @@ public class BarcodeScanner implements SensorDataListener{
 //		}
 		
 		//assign Tuples to pieces
-		int[] whiteCount = new int[7];
-		int[] blackCount = new int[7];
+		Integer[] whiteCount = new Integer[7];
+		Integer[] blackCount = new Integer[7];
 		
-		Iterator<Tuple> it = this.colorBuffer.iterator();
-		while(it.hasNext()){
-			Tuple tuple = it.next();
-			int pieceNb = (int) Math.floor((tuple.distance*7)/totalBarCodeLength);
-			if(tuple.color == TrackSpecs.BLACK_COLOR){
-				blackCount[pieceNb] ++;
+		for(int i = 0; i <7 ; i++){
+			whiteCount[i] = new Integer(0);
+			blackCount[i] = new Integer(0);
+		}
+		
+		
+		for(int i=0; i < bufferSize; i++){
+			int color = this.colorList.get(i);
+			float distance = this.distanceList.get(i);
+			
+			int pieceNb = (int) Math.floor((distance*7)/totalBarCodeLength);
+			pieceNb = Math.max(0,Math.min(6, pieceNb)); // to prevent last sample from being in bin 7
+			if(color == TrackSpecs.BLACK_COLOR){
+				blackCount[pieceNb] = new Integer(blackCount[pieceNb].intValue() +1);
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("black sample in bin "+pieceNb));
-			}else if(tuple.color == TrackSpecs.WHITE_COLOR){
-				whiteCount[pieceNb] ++;
+			}else if(color == TrackSpecs.WHITE_COLOR){
+				whiteCount[pieceNb]  = new Integer(whiteCount[pieceNb].intValue() +1);
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("white sample in bin "+pieceNb));
 			}
 		}
-//		
-//	
-//		
-//		//derive barcode
-//		int barcode = 0x0;
-//		int mask = 0x1;
-//		for(int i = 0; i <7 ; i++){
-//			if(blackCount[i] > whiteCount[i]){
-//				barcode = barcode | mask;
-//				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is black"));
-//			}else if(blackCount[i] < whiteCount[i]){
-//				// bit is already set
-//				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is white"));
-//			}else{
-//				/*
-//				 * barcode can not be determined
-//				 * so do nothing
-//				 * 
-//				 */
-//				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("invalid sample sequence:bit "+i+" can't be determined white = black samples = "+blackCount[i]));
-//				return;
-//			}
-//			mask = mask << 1;
-//		}
-//		
-//		// update the barcode
-//		
-//		this.lastReadBarcode = barcode;
-//		this.lastReadBarcodeTimeStamp = System.currentTimeMillis();
+		
+	
+		
+		//derive barcode
+		int barcode = 0x0;
+		int mask = 0x1;
+		for(int i = 0; i <7 ; i++){
+			if(blackCount[i] > whiteCount[i]){
+				barcode = barcode | mask;
+				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is black"));
+			}else if(blackCount[i] < whiteCount[i]){
+				// bit is already set
+				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is white"));
+			}else{
+				/*
+				 * barcode can not be determined
+				 * so do nothing
+				 * 
+				 */
+				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("invalid sample sequence:bit "+i+" can't be determined white = black samples = "+blackCount[i]));
+				return;
+			}
+			mask = mask << 1;
+		}
+		
+		// update the barcode
+		
+		this.lastReadBarcode = barcode;
+		this.lastReadBarcodeTimeStamp = System.currentTimeMillis();
 //		
 //		
 //		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode detected: "+barcode));

@@ -50,10 +50,7 @@ public class LightSensorPollSpeedCheck implements SensorDataListener {
 		float travelledDistance = (float) (((rTachocountDelta + lTachocountDelta)*RobotSpecs.wheelDiameter*Math.PI)/(2*mm2cm*360));
 		
 		if( Math.abs(travelledDistance) > 2 ){
-//			BTGateway.getInstance().sendPacket(new BTGWPacketMessage("Sample length is to large: '"+travelledDistance+"' > 2 cm"));
-			System.out.println("large: "+travelledDistance);
-		}else{
-			System.out.println("ok: "+travelledDistance);
+			BTGateway.getInstance().sendPacket(new BTGWPacketMessage("Sample length is to large: '"+travelledDistance+"' > 2 cm"));
 		}
 		
 		//update tacho count

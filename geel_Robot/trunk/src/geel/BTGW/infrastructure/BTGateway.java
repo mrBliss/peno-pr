@@ -44,10 +44,15 @@ public class BTGateway {
 	private Thread sendThread = new Thread() {
 		public void run() {
 			System.out.println("SendThead: started");
+			long time = System.currentTimeMillis();
 			BTGWPacket p = null;
 			while( !closeBTGW ) {
 				//transmit all packets in queue and flush
 				while((p = popNextPacket()) != null) {
+					if(System.currentTimeMillis() > time + 5*1000){
+						System.out.println("BTGW queue size: "+$queue.size());
+						time = System.currentTimeMillis();
+					}
 					try {
 						p.transmit($output);
 						$output.flush();

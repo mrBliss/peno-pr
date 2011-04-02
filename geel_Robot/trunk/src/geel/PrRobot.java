@@ -73,7 +73,7 @@ public class PrRobot {
 		 */
 		Behavior[] bArray = new Behavior[] {
 				new ForwardBehavior(rMotor, lMotor),
-//				new WallTracker(sonarSensorReader,rMotor, lMotor),
+				new WallTracker(sonarSensorReader,rMotor, lMotor),
 				new turnCorner(barcodeScanner, lMotor, rMotor),
 				new DriveStraightOnBarcode(barcodeScanner, lMotor, rMotor),
 				new TouchBehavior(touchSensor, rMotor, lMotor),

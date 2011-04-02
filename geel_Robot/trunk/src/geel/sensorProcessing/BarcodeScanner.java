@@ -48,6 +48,8 @@ import lejos.nxt.Motor;
  */
 public class BarcodeScanner implements SensorDataListener{
 	
+
+
 	private List<Integer> colorList = new ArrayList<Integer>();
 	private List<Float> distanceList = new ArrayList<Float>();
 	
@@ -139,7 +141,6 @@ public class BarcodeScanner implements SensorDataListener{
 			
 		}else if(this.consecutiveBrownSampleCounter > this.endBarcodeThreshold){
 			// color sequence is valid and the end of a barcode has been properly  detected
-			BTGateway.getInstance().sendPacket(new BTGWPacketMessage("end of barcode detected, will start deriving barcode"));
 			
 			this.deriveBarcode();
 			
@@ -179,11 +180,9 @@ public class BarcodeScanner implements SensorDataListener{
 					
 			if( lTacho == this.lastLTachocount && rTacho == this.lastRTachocount && this.colorList.size() > 0){
 				// don't buffer sample values if we are standing still
-				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("sample not buffered because we are standing still."));
 				return;
 			}
 			
-			BTGateway.getInstance().sendPacket(new BTGWPacketMessage("new sample '"+color+"' @ "+traveledDistance+"cm"));
 			this.colorList.add(color);
 			this.distanceList.add(traveledDistance);
 		}else{
@@ -264,15 +263,13 @@ public class BarcodeScanner implements SensorDataListener{
 			pieceNb = Math.max(0,Math.min(6, pieceNb)); // to prevent last sample from being in bin 7
 			if(color == TrackSpecs.BLACK_COLOR){
 				blackCount[pieceNb] = new Integer(blackCount[pieceNb].intValue() +1);
-				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("black sample in bin "+pieceNb));
 			}else if(color == TrackSpecs.WHITE_COLOR){
 				whiteCount[pieceNb]  = new Integer(whiteCount[pieceNb].intValue() +1);
-				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("white sample in bin "+pieceNb));
 			}
 		}
 		
 	
-		
+		int unknowBits = 0;
 		//derive barcode
 		int barcode = 0x0;
 		int mask = 0x1;
@@ -289,20 +286,56 @@ public class BarcodeScanner implements SensorDataListener{
 				 * so do nothing
 				 * 
 				 */
-				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("invalid sample sequence:bit "+i+" can't be determined white = black samples = "+blackCount[i]));
-				return;
+				unknowBits ++;
+				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" couldn't be determined white = black samples = "+blackCount[i]+"set to white"));
 			}
 			mask = mask << 1;
 		}
+		
+		//nearest neighbour
+		barcode = this.solomonDecode(barcode);
+		
 		
 		// update the barcode
 		
 		this.lastReadBarcode = barcode;
 		this.lastReadBarcodeTimeStamp = System.currentTimeMillis();
-//		
-//		
-//		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode detected: "+barcode));
 		
+		
+		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode detected: "+TrackSpecs.barcodeToString(barcode)));
+		
+	}
+	
+	//FIXME: is this correct?
+	private int solomonDecode(int barcode) {
+		if( TrackSpecs.isBarcodeValid(barcode))
+			return barcode;
+		else{
+			int mask = 0x01;
+			for(int i =0; i >7 ; i++){
+				//perturb barcode 
+				int perturbedBarcode = barcode ^ mask;
+				if(TrackSpecs.isBarcodeValid(perturbedBarcode)){
+					BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode "+barcode+" was corrected to "+perturbedBarcode));
+					return perturbedBarcode;
+				}
+				mask = mask <<1;
+			}
+		}
+		return barcode;
+		
+	}
+	
+	public int getLastReadBarcode() {
+		return lastReadBarcode;
+	}
+
+	public long getLastReadBarcodeTimeStamp() {
+		return lastReadBarcodeTimeStamp;
+	}
+
+	public boolean isBarcodeDetected() {
+		return barcodeDetected;
 	}
 
 }

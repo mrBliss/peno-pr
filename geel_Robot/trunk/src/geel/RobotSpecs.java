@@ -53,8 +53,8 @@ public class RobotSpecs {
      * the initial threshold values that map the light sensor values [0,1023]
      * to black, ground or white
      */
-	public static int blackGroundThreshold = 300;
-	public static int groundWhiteThreshold = 450;
+	public static int blackGroundThreshold = 430;
+	public static int groundWhiteThreshold = 560;
     
     
     
@@ -68,6 +68,9 @@ public class RobotSpecs {
 	 * which is the width of 1 bit in the barcode
 	 */
 	public static final int defaultSamplePeriod = 30;
+
+
+	public static final int defaultEndBarcodeThreshold = 7;
     
     
     

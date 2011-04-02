@@ -55,6 +55,9 @@ public class RobotSpecs {
      */
 	public static int blackGroundThreshold = 430;
 	public static int groundWhiteThreshold = 560;
+
+
+	public static final int defaultBarcodeSpeed = 300;
     
     
     

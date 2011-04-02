@@ -192,12 +192,16 @@ public class GUISensorPanel extends JPanel implements IBTGWCommandListener {
 			g2.drawImage(touchSensorNotPressedImage, topleftX, topleftY, this);
 		}
 	}
+	
+	private long statusUpdateTS;
 
 	@Override
 	public void handlePacket(BTGWPacket packet) {
 		if(packet.getCommandCode() == BTGWPacket.CMD_STATUSUPDATE) {
 			BTGWPacketStatusUpdate p = (BTGWPacketStatusUpdate) packet;
 			addSensorData(p.getGroundColor(), p.getLightSensorValue(), p.getSonarSensorValue(), p.getSonarSensorRawValue(), p.getTouchSensorValue());
+			System.out.println("status update timestamp: "+p.getTimestamp()+"  delta = "+(p.getTimestamp()-statusUpdateTS));
+			statusUpdateTS = p.getTimestamp();
 		}
 	}
 	

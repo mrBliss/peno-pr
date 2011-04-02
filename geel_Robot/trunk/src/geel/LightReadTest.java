@@ -8,6 +8,7 @@ import geel.BTGW.packets.BTGWPacketPong;
 import geel.BTGW.robot.BTGWRealConnectionTaker;
 import geel.behaviours.Manual;
 import geel.sensorProcessing.LightColorIdentification;
+import geel.sensorProcessing.LightSensorPollSpeedCheck;
 import geel.sensorProcessing.LightSensorReader;
 import geel.sensorProcessing.SensorBTGWLogger;
 import geel.sensorProcessing.SonarSensorReader;
@@ -15,11 +16,14 @@ import lejos.nxt.TouchSensor;
 import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
-public class BarCodeReader {
+public class LightReadTest {
 
 	
 	
 	public static void main(String args[]) throws Exception {
+		//references to robot left and right motor classes 
+		RMotor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
+		RMotor motorRight = new RMotor(RobotSpecs.rightMotorPort);
 		
 		/*******************************************
 		 * Bluetooth Gateway initialization
@@ -42,6 +46,7 @@ public class BarCodeReader {
 		
 		// create light sensor processing chain
 		LightColorIdentification lightColorIdentification = new LightColorIdentification(lightSensorReader);
+		new LightSensorPollSpeedCheck(lightSensorReader, motorLeft, motorRight);
 		
 		// create sonar sensor processing chain
 		//fixme: add the processed data producer
@@ -53,9 +58,6 @@ public class BarCodeReader {
 		/*******************************************
 		 * behavior and arbitrator initialization
 		 *******************************************/
-		//references to robot left and right motor classes use by the behaviors
-		RMotor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
-		RMotor motorRight = new RMotor(RobotSpecs.rightMotorPort);
 
 		/*
 		 * instantiate an array of behaviors that will control the robot from

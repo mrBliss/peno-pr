@@ -7,12 +7,11 @@ import lejos.robotics.subsumption.Behavior;
 
 public class ForwardBehavior implements Behavior {
 	
-	private int speed;
+	private int speed = 800;
 	private Motor motorLeft, motorRight;
 
 
-	public ForwardBehavior(int speed, Motor motorRight, Motor motorLeft) {
-		this.speed = speed;
+	public ForwardBehavior( Motor motorRight, Motor motorLeft) {
 		this.motorLeft = motorLeft;
 		this.motorRight = motorRight;
 	}

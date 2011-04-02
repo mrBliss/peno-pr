@@ -90,7 +90,7 @@ public class Robot {
          * from lowest to highest  behavior priority
          */
         Behavior[] bArray = new Behavior[]{
-        	new ForwardBehavior(speed, motorRight, motorLeft),
+        	new ForwardBehavior(motorRight, motorLeft),
         	new BarcodeBehavior(light, speed, motorRight, motorLeft),
         	new MuurvolgerBehavior(sonar, motorRight, motorLeft),
         	new TouchBehavior(touch, motorRight, motorLeft),

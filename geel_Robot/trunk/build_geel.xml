@@ -6,17 +6,17 @@
 	<!-- load constants -->
 	<property file="constants.properties" />
 	<!--=======================================================================-->
-	
-	
+
+
 
 	<!--=======================================================================-->
 	<!-- primary properties -->
-	
+
 	<!-- lejos home directory -->
-	<property name="nxj.home" value="${nxj.home.zadeh}"/>
+	<property name="nxj.home" value="${nxj.home.zadeh}" />
 
 	<!-- the main class of the program -->
-	<property name="mainClass" value="geel.ConfigTest" />
+	<property name="mainClass" value="geel.WallTracker2" />
 
 	<!-- adress of the NXT brick to upload to -->
 	<property name="nxt.address" value="${nxt.address.blauw}" />
@@ -25,7 +25,7 @@
 
 	<!--=======================================================================-->
 	<!-- derived properties -->
-	
+
 	<!-- seperated src and bin directories -->
 	<property name="src" location="./src" />
 	<property name="bin" location="./antbin" />
@@ -34,7 +34,7 @@
 	<property file="lejos.properties" />
 
 	<!-- nxj-file produced by linker -->
-	<property name="program" value="${mainClass}"/>
+	<property name="program" value="${mainClass}" />
 	<property name="nxjFile" value="${bin}/${program}.nxj" />
 	<!--=======================================================================-->
 

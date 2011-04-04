@@ -4,6 +4,8 @@ import geel.RobotSpecs;
 import geel.TrackSpecs;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketMessage;
+import geel.barcodes.Barcode;
+import geel.barcodes.BarcodeDecoder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,6 +50,14 @@ import lejos.nxt.Motor;
  */
 public class BarcodeScanner implements SensorDataListener{
 	
+    /**
+     * barcode specification mapping barcode color to a bit value 
+     *  0 = black
+     *  1 = white
+     */
+    public static final int  BLACK_BAR_VALUE = 0;
+    public static final int  WHITE_BAR_VALUE = 1;
+	
 
 
 	private List<Integer> colorList = new ArrayList<Integer>();
@@ -75,7 +85,7 @@ public class BarcodeScanner implements SensorDataListener{
 	private int endBarcodeThreshold = RobotSpecs.defaultEndBarcodeThreshold;
 	
 	
-	private int lastReadBarcode;
+	private Barcode lastReadBarcode;
 	private long lastReadBarcodeTimeStamp = 0;
 	
 	/*
@@ -269,64 +279,45 @@ public class BarcodeScanner implements SensorDataListener{
 		}
 		
 	
-		int unknowBits = 0;
 		//derive barcode
-		int barcode = 0x0;
-		int mask = 0x1;
+		/* FIXME: the barcode doesn't start nor end on the first and respectively last sample.
+		 * this should also be taken into account.
+		 */
+		int unknowBits = 0;
+		Barcode barcode = new Barcode();
 		for(int i = 0; i <7 ; i++){
 			if(blackCount[i] > whiteCount[i]){
-				barcode = barcode | mask;
+				barcode.setBit(i,TrackSpecs.BLACK_BAR_VALUE);
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is black"));
 			}else if(blackCount[i] < whiteCount[i]){
-				// bit is already set
+				barcode.setBit(i,TrackSpecs.WHITE_BAR_VALUE);
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" is white"));
 			}else{
 				/*
-				 * barcode can not be determined
-				 * so do nothing
-				 * 
+				 * bar color can not be determined
+				 * set it to white by default
 				 */
 				unknowBits ++;
+				barcode.setBit(i,TrackSpecs.WHITE_BAR_VALUE);
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("bit "+i+" couldn't be determined white = black samples = "+blackCount[i]+"set to white"));
 			}
-			mask = mask << 1;
 		}
 		
-		//nearest neighbour
-		barcode = this.solomonDecode(barcode);
+		//correct barcode neighbour
+		barcode = BarcodeDecoder.nearestNeighbor(barcode);
 		
 		
 		// update the barcode
-		
 		this.lastReadBarcode = barcode;
 		this.lastReadBarcodeTimeStamp = System.currentTimeMillis();
 		
 		
-		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode detected: "+TrackSpecs.barcodeToString(barcode)));
+		BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode detected: "+barcode));
 		
 	}
 	
-	//FIXME: is this correct?
-	private int solomonDecode(int barcode) {
-		if( TrackSpecs.isBarcodeValid(barcode))
-			return barcode;
-		else{
-			int mask = 0x01;
-			for(int i =0; i >7 ; i++){
-				//perturb barcode 
-				int perturbedBarcode = barcode ^ mask;
-				if(TrackSpecs.isBarcodeValid(perturbedBarcode)){
-					BTGateway.getInstance().sendPacket(new BTGWPacketMessage("barcode "+barcode+" was corrected to "+perturbedBarcode));
-					return perturbedBarcode;
-				}
-				mask = mask <<1;
-			}
-		}
-		return barcode;
-		
-	}
 	
-	public int getLastReadBarcode() {
+	public Barcode getLastReadBarcode() {
 		return lastReadBarcode;
 	}
 

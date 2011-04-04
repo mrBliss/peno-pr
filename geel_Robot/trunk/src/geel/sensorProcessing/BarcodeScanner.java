@@ -130,7 +130,8 @@ public class BarcodeScanner implements SensorDataListener{
 		int rTacho = rMotor.getTachoCount();
 		
 		if(!this.barcodeDetected){
-			if(value == TrackSpecs.BLACK_COLOR || value == TrackSpecs.WHITE_COLOR){
+			if(value == LightColorIdentification.BLACK ||
+					value == LightColorIdentification.WHITE){
 				// the start of a barcode has been detected
 				BTGateway.getInstance().sendPacket(new BTGWPacketMessage("start of barcode detected"));
 				
@@ -184,7 +185,8 @@ public class BarcodeScanner implements SensorDataListener{
 		
 		float traveledDistance = this.traveledDistance(lTacho, rTacho);
 		
-		if(color == TrackSpecs.BLACK_COLOR || color == TrackSpecs.WHITE_COLOR){
+		if(color == LightColorIdentification.BLACK || 
+				color == LightColorIdentification.WHITE){
 			this.consecutiveBrownSampleCounter = 0;
 			
 					
@@ -271,9 +273,9 @@ public class BarcodeScanner implements SensorDataListener{
 			
 			int pieceNb = (int) Math.floor((distance*7)/totalBarCodeLength);
 			pieceNb = Math.max(0,Math.min(6, pieceNb)); // to prevent last sample from being in bin 7
-			if(color == TrackSpecs.BLACK_COLOR){
+			if(color == LightColorIdentification.BLACK){
 				blackCount[pieceNb] = new Integer(blackCount[pieceNb].intValue() +1);
-			}else if(color == TrackSpecs.WHITE_COLOR){
+			}else if(color == LightColorIdentification.WHITE){
 				whiteCount[pieceNb]  = new Integer(whiteCount[pieceNb].intValue() +1);
 			}
 		}

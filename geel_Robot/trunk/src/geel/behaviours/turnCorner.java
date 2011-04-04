@@ -8,11 +8,16 @@ import geel.sensorProcessing.BarcodeScanner;
 import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;
 
+/**
+ * Behavior that will turn the corner if the next tile is a left or right turn.
+ * Tile types are identified by the barcodes specified in TrackSpecs.
+ * @author jeroendv
+ *
+ */
 public class turnCorner implements Behavior {
 	
 	private boolean  isSuppressed;
 	
-	private long actionTimestamp = 0;
 	
 	private int speed = RobotSpecs.defaultTurnSpeed;
 	
@@ -27,6 +32,7 @@ public class turnCorner implements Behavior {
 
 
 	private BarcodeScanner barcodeScanner;
+	private long actionTimestamp = 0;
 	
 	private Motor lMotor;
 	private Motor rMotor;
@@ -124,12 +130,12 @@ public class turnCorner implements Behavior {
 
 
 	private boolean isLeftTurnTile() {
-		return this.barcodeScanner.getLastReadBarcode()== TrackSpecs.TurnLeftBarcode;
+		return this.barcodeScanner.getLastReadBarcode().equals(TrackSpecs.Tile.LEFT_TURN.barcode);
 	}
 
 
 	private boolean isRightTurnTile() {
-		return this.barcodeScanner.getLastReadBarcode() == TrackSpecs.TurnRighBarcode;
+		return this.barcodeScanner.getLastReadBarcode().equals(TrackSpecs.Tile.RIGHT_TURN.barcode);
 	}
 
 }

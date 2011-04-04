@@ -10,13 +10,7 @@ import java.util.Hashtable;
  *
  */
 public class TrackSpecs {
-	
-	/**
-	 * integer codes for the 3 different colors identified by the robot
-	 */
-	public static final int BLACK_COLOR = 0;
-	public static final int GROUND_COLOR = 1;
-	public static final int WHITE_COLOR = 2;
+
 	
 	
 	/**
@@ -41,13 +35,28 @@ public class TrackSpecs {
     
     
     /**
-     * 
+     * list of tile types together with a reference to the barcode that identifies it
      */
-	public static final Barcode TurnRighBarcode = BarcodeDecoder.VALID_BARCODES[6];
-	 //TODO
-	public static final Barcode TurnLeftBarcode = BarcodeDecoder.VALID_BARCODES[3];
-	//TODO
-	public static final Barcode GoForwardBarcode = BarcodeDecoder.VALID_BARCODES[1];
+    public static enum Tile{
+    	LEFT_TURN(BarcodeDecoder.VALID_BARCODES[6]),
+    	RIGHT_TURN(BarcodeDecoder.VALID_BARCODES[3]),
+    	STRAIGHT_ON(BarcodeDecoder.VALID_BARCODES[1]),
+    	RAMP_UP(null),
+    	RAMP_DOWN(null),
+    	CHOKEPOINT(null);
+    	
+    	
+    	/*
+    	 * barcode that identifies a Tile
+    	 */
+    	public final Barcode barcode;
+    	
+    	private Tile(Barcode barcode){
+    		this.barcode =  barcode;
+    	}
+    }
+    
+    
 	
 	
     

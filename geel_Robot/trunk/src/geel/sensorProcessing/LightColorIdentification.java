@@ -22,6 +22,13 @@ import geel.TrackSpecs;
 public class LightColorIdentification implements SensorDataListener,
 		SensorDataProducer,Configurable {
 	
+	/**
+	 * integer codes for the 3 different colors identified by the robot
+	 */
+	public static final int BLACK = 0;
+	public static final int GROUND = 1;
+	public static final int WHITE = 2;
+	
 	public static final String  blackGroundThresholdId = "tresholdBrownBlack";
 	private int blackGroundThreshold;
 	
@@ -56,11 +63,11 @@ public class LightColorIdentification implements SensorDataListener,
 		// map the light sensor data [0, 1023] to a color
 		int color;
 		if(value >= this.groundWhiteThreshold){
-			color = TrackSpecs.WHITE_COLOR;
+			color = WHITE;
 		}else if(value >= this.blackGroundThreshold){
-			color = TrackSpecs.GROUND_COLOR;
+			color = GROUND;
 		}else{
-			color = TrackSpecs.BLACK_COLOR;
+			color = BLACK;
 		}
 		
 		//propagate this new sensor data to the listeners

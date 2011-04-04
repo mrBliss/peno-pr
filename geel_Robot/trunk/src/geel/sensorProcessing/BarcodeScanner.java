@@ -8,7 +8,6 @@ import geel.barcodes.Barcode;
 import geel.barcodes.BarcodeDecoder;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import lejos.nxt.Motor;
@@ -49,14 +48,6 @@ import lejos.nxt.Motor;
  *
  */
 public class BarcodeScanner implements SensorDataListener{
-	
-    /**
-     * barcode specification mapping barcode color to a bit value 
-     *  0 = black
-     *  1 = white
-     */
-    public static final int  BLACK_BAR_VALUE = 0;
-    public static final int  WHITE_BAR_VALUE = 1;
 	
 
 

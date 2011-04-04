@@ -41,8 +41,8 @@ public class LightColorIdentification implements SensorDataListener,
 		lightSensorReader.addListener(this);
 		
 		//set some initial threshold values
-		this.blackGroundThreshold = RobotSpecs.blackGroundThreshold;
-		this.groundWhiteThreshold = RobotSpecs.groundWhiteThreshold;
+		this.blackGroundThreshold = RobotSpecs.defaultBlackGroundThreshold;
+		this.groundWhiteThreshold = RobotSpecs.defaultGroundWhiteThreshold;
 	}
 	
 	

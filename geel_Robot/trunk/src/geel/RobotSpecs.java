@@ -1,6 +1,5 @@
 package geel;
-import lejos.nxt.BasicMotor;
-import lejos.nxt.Motor;
+
 import lejos.nxt.MotorPort;
 import lejos.nxt.SensorPort;
 import lejos.nxt.TachoMotorPort;
@@ -44,7 +43,6 @@ public class RobotSpecs {
     
     public  static TachoMotorPort  leftMotorPort = MotorPort.A;
     public  static TachoMotorPort  rightMotorPort = MotorPort.C;
-    public  static MotorPort  	   lightSource	  = MotorPort.B;
     
     /**
      * specify the port to which each sensor is attached
@@ -66,6 +64,9 @@ public class RobotSpecs {
     
     
     
+    /**
+     * conversion factor mm to cm
+     */
     private static final int mm2cm = 10;
 
 

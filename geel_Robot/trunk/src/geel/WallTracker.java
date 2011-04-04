@@ -8,6 +8,7 @@ import geel.BTGW.infrastructure.*;
 import geel.behaviours.Manual;
 import geel.behaviours.MuurvolgerBehavior;
 import geel.behaviours.TouchBehavior;
+import geel.sensorProcessing.LightColorIdentification;
 import lejos.nxt.LightSensor;
 import lejos.nxt.TouchSensor;
 import lejos.nxt.UltrasonicSensor;
@@ -50,8 +51,9 @@ public class WallTracker {
 					int _light = WallTracker.light.readNormalizedValue();
 					boolean _touch = WallTracker.touch.isPressed();
 
+					int bogusGroundColor = LightColorIdentification.WHITE;
 					BTGateway.getInstance().sendPacket(
-							new BTGWPacketStatusUpdate(TrackSpecs.WHITE_COLOR,_light, _sonar,_sonar, _touch));
+							new BTGWPacketStatusUpdate(bogusGroundColor,_light, _sonar,_sonar, _touch));
 					try {
 						sleep(100);
 					} catch (InterruptedException e) {
@@ -125,25 +127,6 @@ public class WallTracker {
 
 					}
 				});
-		
-		/*
-		 * todo: what does this do??? 
-		 */
-		IBTGWCommandListener lightOperator = new IBTGWCommandListener() {
-					@Override
-					public void handlePacket(BTGWPacket packet) {
-						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_ON) {
-							System.out.println("Turning light on");
-							RobotSpecs.lightSource.controlMotor(100, 1);
-						}
-						if (packet.getCommandCode() == BTGWPacket.CMD_LIGHT_OFF) {
-							RobotSpecs.lightSource.controlMotor(0, 4);
-							System.out.println("Turning light off");
-						}
-					}
-				};
-		BTGateway.getInstance().addListener(BTGWPacket.CMD_LIGHT_ON, lightOperator);
-		BTGateway.getInstance().addListener(BTGWPacket.CMD_LIGHT_OFF, lightOperator);
 	}
 
 	/**

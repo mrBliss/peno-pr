@@ -15,27 +15,29 @@ package geel.barcodes;
  */
 public class BarcodeDecoder {
 	
+	public final static int BARCODELENGTH = 7;
+	
     
     /**
-     * an array of the 16 valid bit sequences
+     * an array of the 16 valid barcodes
      */
-    public static final Barcode[] VALID_BARCODES = new Barcode[]{
-    	new Barcode("0000000"), // 0
-    	new Barcode("0001111"), // 1
-    	new Barcode("0010110"), // 2
-    	new Barcode("0011001"), // 3
-    	new Barcode("0100101"), // 4
-    	new Barcode("0101010"), // 5
-    	new Barcode("0110011"), // 6
-    	new Barcode("0111100"), // 7
-    	new Barcode("1000011"), // 8
-    	new Barcode("1001100"), // 9
-    	new Barcode("1010101"), // A 10
-    	new Barcode("1011010"), // B 11
-    	new Barcode("1100110"), // C 12
-    	new Barcode("1101001"), // D 13
-    	new Barcode("1110000"), // E 14
-    	new Barcode("1111111"), // F 15
+    public static final BitSequence[] VALID_BARCODES = new BitSequence[]{
+    	new BitSequence("0000000"), // 0  0
+    	new BitSequence("0001111"), // 1  1
+    	new BitSequence("0010110"), // 2  2
+    	new BitSequence("0011001"), // 3  3
+    	new BitSequence("0100101"), // 4  4
+    	new BitSequence("0101010"), // 5  5
+    	new BitSequence("0110011"), // 6  6
+    	new BitSequence("0111100"), // 7  7
+    	new BitSequence("1000011"), // 8  8
+    	new BitSequence("1001100"), // 9  9
+    	new BitSequence("1010101"), // A 10
+    	new BitSequence("1011010"), // B 11
+    	new BitSequence("1100110"), // C 12
+    	new BitSequence("1101001"), // D 13
+    	new BitSequence("1110000"), // E 14
+    	new BitSequence("1111111"), // F 15
     };	
 	
     /**
@@ -44,12 +46,17 @@ public class BarcodeDecoder {
      * @param barcode 
      * @return true 
      */
-    public static boolean isBarcodeValid(Barcode barcode){
+    public static boolean isBarcodeValid(BitSequence barcode){
+    	if(barcode.length != BARCODELENGTH){
+    		throw new IllegalArgumentException("a barcode must be a bit sequence of 7 bits"); 
+    	}
+    	
     	for(byte i = 0; i < BarcodeDecoder.VALID_BARCODES.length; i++){
     		if( BarcodeDecoder.VALID_BARCODES[i].equals(barcode) ){
     			return true;
     		}
     	}
+    	
     	return false;
     }
     
@@ -58,25 +65,31 @@ public class BarcodeDecoder {
     /**
      * nearest neighbor decoder,
      * which maps any of the 128 possible 7 bit sequences to 
-     * one of the valid barcodes though a one bit change.
+     * one of the valid barcodes through a one bit change.
      * 
      * @param barcode
      * @return
      */
-    public static Barcode nearestNeighbor(Barcode barcode){
+    public static BitSequence nearestNeighbor(BitSequence barcode){
+    	if(barcode.length != BARCODELENGTH){
+    		throw new IllegalArgumentException("a barcode must be a bit sequence of 7 bits"); 
+    	}
+    	
     	if(isBarcodeValid(barcode)){
     		return barcode;
     	}else{
-    		for( int i=0 ; i<7 ; i++){
-    			Barcode perturbedBarcode = new Barcode(barcode);
+    		for( int i=0 ; i<BARCODELENGTH ; i++){
+    			BitSequence perturbedBarcode = new BitSequence(barcode);
     			perturbedBarcode.flipBit(i);
+    			
     			if(isBarcodeValid(perturbedBarcode)){
     				return perturbedBarcode;
     			}
     		}
     	}
     	
-    	throw new IllegalStateException("there must be a bug! this should never happen");
+    	throw new IllegalStateException("there must be a bug! this should never happen, " +
+    			"every 7 bit sequence should have a valid barcode as neighbor");
     }
     
     

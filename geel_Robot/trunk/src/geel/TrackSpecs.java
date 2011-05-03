@@ -1,6 +1,6 @@
 package geel;
 
-import geel.barcodes.Barcode;
+import geel.barcodes.BitSequence;
 import geel.barcodes.BarcodeDecoder;
 
 import java.util.Hashtable;
@@ -49,9 +49,9 @@ public class TrackSpecs {
     	/*
     	 * barcode that identifies a Tile
     	 */
-    	public final Barcode barcode;
+    	public final BitSequence barcode;
     	
-    	private Tile(Barcode barcode){
+    	private Tile(BitSequence barcode){
     		this.barcode =  barcode;
     	}
     }

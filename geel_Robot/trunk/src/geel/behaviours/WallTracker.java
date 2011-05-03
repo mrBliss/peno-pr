@@ -1,11 +1,9 @@
 package geel.behaviours;
 
 import geel.RobotSpecs;
-import geel.TrackSpecs;
 import geel.sensorProcessing.SensorDataListener;
 import geel.sensorProcessing.SonarSensorReader;
 import lejos.nxt.Motor;
-import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.subsumption.Behavior;
 
 /**
@@ -15,7 +13,7 @@ import lejos.robotics.subsumption.Behavior;
  * 
  * see takeControl() and action()
  * 
- * @author team geel
+ * @author jeroendv
  * 
  */
 public class WallTracker implements Behavior {

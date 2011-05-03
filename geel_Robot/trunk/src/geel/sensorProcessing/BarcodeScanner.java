@@ -4,7 +4,7 @@ import geel.RobotSpecs;
 import geel.TrackSpecs;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketMessage;
-import geel.barcodes.Barcode;
+import geel.barcodes.BitSequence;
 import geel.barcodes.BarcodeDecoder;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class BarcodeScanner implements SensorDataListener{
 	private int endBarcodeThreshold = RobotSpecs.defaultEndBarcodeThreshold;
 	
 	
-	private Barcode lastReadBarcode;
+	private BitSequence lastReadBarcode;
 	private long lastReadBarcodeTimeStamp = 0;
 	
 	/*
@@ -277,7 +277,7 @@ public class BarcodeScanner implements SensorDataListener{
 		 * this should also be taken into account.
 		 */
 		int unknowBits = 0;
-		Barcode barcode = new Barcode();
+		BitSequence barcode = new BitSequence(7);
 		for(int i = 0; i <7 ; i++){
 			if(blackCount[i] > whiteCount[i]){
 				barcode.setBit(i,TrackSpecs.BLACK_BAR_VALUE);
@@ -310,7 +310,7 @@ public class BarcodeScanner implements SensorDataListener{
 	}
 	
 	
-	public Barcode getLastReadBarcode() {
+	public BitSequence getLastReadBarcode() {
 		return lastReadBarcode;
 	}
 

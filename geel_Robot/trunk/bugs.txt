@@ -1,0 +1,55 @@
+* nxjupload will search for a brick first on usb then through bluetooth
+  when supplying an only address it only searched usb, not BT, as if the -u flag was present
+  to seach BT one must explicitly mention the -b flag an *no* -u flag.
+  
+  nicer behaviour would be the following
+  -u 	only search usb
+  -b 	only seach bt
+  -u -b first seach usb then bluetooth
+  -b -u first search usb then bluetooth
+        first seach usb then bluetooth
+  
+  the -d flag should only restrict the search space, searching for a specific brick not just any brick
+  it should not affect the channels on which the search is performed.
+  
+* inconsistent behavior of the -d flag syntax
+  the -d flag of nxj commands should accept both '00:16:53:06:4E:B1'  and '001653064EB1'
+  as syntax.
+  
+  at the moment it accepts both when connecting on a BT channel,
+  but only the latter when connecting over an usb channel!!
+  
+* the collection framework is not implemented, and the hashtable is not properly implemented
+  might be a good idea to make a list of all the thing that are and which aren't implemented.
+  
+* doc and source code comments for arbitrator do not correspond to the actual implementation!!
+
+
+* lejos.robotics.localization.TachoLocalizer the doc mentions that takeReading() should be implemented by subclasses 
+  but there is no doc stipulating a contract as to what that method should be doing?!?
+  
+* lejos.robotics.navigation.SimpleNavigator uses 'dead reckoning', what the fuck does that mean??
+
+* lejos.robotics.localization.TachoLocalizer: bad documentation
+  ...
+  An abstract extension to TachoNavigator that uses a map and a set of particles
+  to implement the Monte Carlo Localization algorithm to estimate the pose
+  of the robot as it moves about  
+  ...
+  
+  what does this mean? i need more info ...
+  
+  
+ * The RMotor class is a wrapper around the {@link Motor} class that reverses the forward and backward functional methods
+   in those cases where rotating the motors forward results in backward motion of the robot.
+  
+   The reason that this is a wrapper and not a subclass of {@link Motor}, which would be preferable, is due to 
+   a bad implementation of {@link Motor}. The {@link Motor} class internally uses an regulator thread, which directly manipulate some fields
+   instead of using the forward() or backward()  primary methods. which means that this regulator will function incorrectly if these methods are
+   overwritten by a subclass because it is unaware of this change.
+   forcing us to make a wrapper class that does not overwrite these methods!
+   
+   TachoPilot has a reverse flag in its constructor that allows this reverse behaviour for a differentially steered robot.
+   It would be better is this reverse flag would be incorporated in the Motor class, allowing the user to arbitrarily define what he means with a
+   forward rotation.
+  

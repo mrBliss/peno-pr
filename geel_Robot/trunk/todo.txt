@@ -35,3 +35,11 @@
   
 * if the BTGateway is not initialized then messages should simply be discarded, the program should not crash!!
   I.e. the robot should continue on independently if BT is available or not!
+  
+  
+* find something more suited to handle different robot specs.
+
+  you want to be able to define  different specs for different robots.
+  but also reuse the specs of one robot for several different programs.
+  
+  

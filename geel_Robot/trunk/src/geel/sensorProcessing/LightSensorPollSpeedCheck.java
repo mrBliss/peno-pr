@@ -1,6 +1,5 @@
 package geel.sensorProcessing;
 
-import lejos.nxt.Motor;
 import geel.RMotor;
 import geel.RobotSpecs;
 import geel.BTGW.infrastructure.BTGateway;
@@ -19,8 +18,7 @@ import geel.BTGW.packets.BTGWPacketMessage;
  */
 public class LightSensorPollSpeedCheck implements SensorDataListener {
 	
-	private Motor rMotor;
-	private Motor lMotor;
+	private RMotor rMotor, lMotor;
 	
 	/*
 	 * values of the left and right tacho count at the moment of the last light sensor sample
@@ -28,7 +26,7 @@ public class LightSensorPollSpeedCheck implements SensorDataListener {
 	private int lastLTachocount;
 	private int lastRTachocount;
 	
-	public LightSensorPollSpeedCheck(LightSensorReader sensorDataProducer,Motor lMotor, Motor rMotor) {
+	public LightSensorPollSpeedCheck(LightSensorReader sensorDataProducer,RMotor lMotor, RMotor rMotor) {
 		sensorDataProducer.addListener(this);
 		
 		this.rMotor = rMotor;

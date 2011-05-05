@@ -1,19 +1,18 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.infrastructure.IBTGWCommandListener;
 import geel.BTGW.packets.BTGWPacket;
 import geel.BTGW.packets.BTGWPacketManualOverride;
 import geel.BTGW.packets.BTGWPacketManualSteer;
-import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;
 
 public class Manual implements Behavior, IBTGWCommandListener {
-    private Motor rightMotor;
-    private Motor leftMotor;
+    private RMotor rightMotor, leftMotor;
     private boolean active = false;
 
-    public Manual(Motor rightMotor, Motor leftMotor) {
+    public Manual(RMotor rightMotor, RMotor leftMotor) {
         this.rightMotor = rightMotor;
         this.leftMotor = leftMotor;
         

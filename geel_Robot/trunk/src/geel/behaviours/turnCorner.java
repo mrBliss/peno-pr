@@ -1,11 +1,11 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.RobotSpecs;
 import geel.TrackSpecs;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketMessage;
 import geel.sensorProcessing.BarcodeScanner;
-import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;
 
 /**
@@ -36,11 +36,10 @@ public class turnCorner implements Behavior {
 	private BarcodeScanner barcodeScanner;
 	private long actionTimestamp = 0;
 	
-	private Motor lMotor;
-	private Motor rMotor;
+	private RMotor lMotor, rMotor;
 	
 
-	public turnCorner(BarcodeScanner barcodeScanner, Motor lMotor, Motor rMotor) {
+	public turnCorner(BarcodeScanner barcodeScanner, RMotor lMotor, RMotor rMotor) {
 		super();
 		this.barcodeScanner = barcodeScanner;
 		this.lMotor = lMotor;

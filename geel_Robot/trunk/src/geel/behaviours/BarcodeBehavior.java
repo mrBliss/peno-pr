@@ -1,10 +1,10 @@
 package geel.behaviours;
 
 
+import geel.RMotor;
 import geel.Robot;
 import geel.track.TrackTracker;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -28,7 +28,7 @@ public class BarcodeBehavior implements Behavior {
 
 	private int speed;
 
-	private Motor motorLeft, motorRight;
+	private RMotor motorLeft, motorRight;
 
 	private static TrackTracker trackTracker = new TrackTracker();
 
@@ -65,8 +65,8 @@ public class BarcodeBehavior implements Behavior {
 	 * @param motorLeft
 	 * @param motorRight
 	 */
-	public BarcodeBehavior(LightSensor light, int speed, Motor motorRight,
-			Motor motorLeft) {
+	public BarcodeBehavior(LightSensor light, int speed, RMotor motorRight,
+			RMotor motorLeft) {
 		this.light = light;
 		this.speed = speed;
 		this.motorLeft = motorLeft;

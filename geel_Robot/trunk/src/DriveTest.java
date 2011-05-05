@@ -18,8 +18,8 @@ public class DriveTest {
 	
 	public static void main(String[] args) throws InterruptedException {
 		
-		Motor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
-		Motor motorRight = new RMotor(RobotSpecs.rightMotorPort);
+		RMotor motorLeft = new RMotor(RobotSpecs.leftMotorPort);
+		RMotor motorRight = new RMotor(RobotSpecs.rightMotorPort);
 		
 		int speed = 300;
 		long timeToTravelTileMs = RobotSpecs.timeToTravel(speed, TrackSpecs.tileWidth);

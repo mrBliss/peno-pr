@@ -1,8 +1,7 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.RobotSpecs;
-import geel.BTGW.infrastructure.BTGateway;
-import geel.BTGW.packets.BTGWPacketMessage;
 import geel.sensorProcessing.BarcodeScanner;
 import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;
@@ -18,8 +17,8 @@ public class DriveStraightOnBarcode implements Behavior {
 	private boolean isSuppressed;
 	private BarcodeScanner barcodeScanner;
 	
-	private Motor lMotor;
-	private Motor rMotor;
+	private RMotor lMotor;
+	private RMotor rMotor;
 	
 	/*
 	 * the speed of the robot when on a barcode
@@ -27,8 +26,8 @@ public class DriveStraightOnBarcode implements Behavior {
 	private int speed= RobotSpecs.defaultBarcodeSpeed;
 	
 
-	public DriveStraightOnBarcode(BarcodeScanner barcodeScanner, Motor lMotor,
-			Motor rMotor) {
+	public DriveStraightOnBarcode(BarcodeScanner barcodeScanner, RMotor lMotor,
+			RMotor rMotor) {
 		super();
 		this.barcodeScanner = barcodeScanner;
 		this.lMotor = lMotor;

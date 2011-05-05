@@ -1,17 +1,17 @@
 package geel.behaviours;
 
 
-import lejos.nxt.*;
+import geel.RMotor;
 import lejos.robotics.subsumption.Behavior;
 
 
 public class ForwardBehavior implements Behavior {
 	
 	private int speed = 800;
-	private Motor motorLeft, motorRight;
+	private RMotor motorLeft, motorRight;
 
 
-	public ForwardBehavior( Motor motorRight, Motor motorLeft) {
+	public ForwardBehavior( RMotor motorRight, RMotor motorLeft) {
 		this.motorLeft = motorLeft;
 		this.motorRight = motorRight;
 	}

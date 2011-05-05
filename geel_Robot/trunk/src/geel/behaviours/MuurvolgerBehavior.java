@@ -1,8 +1,8 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.RobotSpecs;
 import geel.TrackSpecs;
-import lejos.nxt.Motor;
 import lejos.nxt.UltrasonicSensor;
 import lejos.robotics.subsumption.Behavior;
 
@@ -104,8 +104,7 @@ public class MuurvolgerBehavior implements Behavior {
     
     // references to the sonar sensor and robot motors  needed by this behaviour
     private UltrasonicSensor ultra;
-	private Motor motorLeft;
-	private Motor motorRight;
+	private RMotor motorLeft, motorRight;
 
 
 
@@ -119,7 +118,7 @@ public class MuurvolgerBehavior implements Behavior {
      * @param speed
      * @param turnSpeed
      */
-    public MuurvolgerBehavior(UltrasonicSensor ultra, Motor motorRight, Motor motorLeft) {
+    public MuurvolgerBehavior(UltrasonicSensor ultra, RMotor motorRight, RMotor motorLeft) {
         this.ultra = ultra;
         this.motorLeft = motorLeft;
         this.motorRight = motorRight;

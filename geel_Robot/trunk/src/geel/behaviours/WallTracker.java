@@ -1,9 +1,9 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.RobotSpecs;
 import geel.sensorProcessing.SensorDataListener;
 import geel.sensorProcessing.SonarSensorReader;
-import lejos.nxt.Motor;
 import lejos.robotics.subsumption.Behavior;
 
 /**
@@ -53,8 +53,7 @@ public class WallTracker implements Behavior {
     
     
     // references to the sonar sensor and robot motors  needed by this behaviour
-	private Motor motorLeft;
-	private Motor motorRight;
+	private RMotor motorLeft, motorRight;
 
 
 
@@ -68,7 +67,7 @@ public class WallTracker implements Behavior {
      * @param speed
      * @param turnSpeed
      */
-    public WallTracker(SonarSensorReader reader, Motor motorRight, Motor motorLeft) {
+    public WallTracker(SonarSensorReader reader, RMotor motorRight, RMotor motorLeft) {
         this.motorLeft = motorLeft;
         this.motorRight = motorRight;
         

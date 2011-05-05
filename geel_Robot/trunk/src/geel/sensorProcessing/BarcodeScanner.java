@@ -1,16 +1,15 @@
 package geel.sensorProcessing;
 
+import geel.RMotor;
 import geel.RobotSpecs;
 import geel.TrackSpecs;
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketMessage;
-import geel.barcodes.BitSequence;
 import geel.barcodes.BarcodeDecoder;
+import geel.barcodes.BitSequence;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import lejos.nxt.Motor;
 
 /**
  * This class will scan for barcodes based on a stream of color samples
@@ -83,8 +82,7 @@ public class BarcodeScanner implements SensorDataListener{
 	 * references to the motors of the wheels to access tacho count values
 	 * when a color sample arrives
 	 */
-	private Motor rMotor;
-	private Motor lMotor;
+	private RMotor rMotor, lMotor;
 	
 	/*
 	 * tacho count for previous color sample
@@ -103,7 +101,7 @@ public class BarcodeScanner implements SensorDataListener{
 	private int consecutiveBrownSampleCounter;
 	
 	
-	public BarcodeScanner(LightColorIdentification colorProducer,Motor lMotor, Motor rMotor){
+	public BarcodeScanner(LightColorIdentification colorProducer, RMotor lMotor, RMotor rMotor){
 		colorProducer.addListener(this);
 		
 		this.rMotor = rMotor;

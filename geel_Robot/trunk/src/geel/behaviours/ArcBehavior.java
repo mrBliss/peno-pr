@@ -1,5 +1,6 @@
 package geel.behaviours;
 
+import geel.RMotor;
 import geel.Robot;
 import geel.track.TrackTracker;
 import lejos.nxt.Motor;
@@ -23,7 +24,7 @@ public class ArcBehavior implements Behavior {
 	private final char omkeren3 = 'E';
 	private int aantalOmgekeerd;
 	private int speed;
-	private Motor motorLeft, motorRight;
+	private RMotor motorLeft, motorRight;
 	private boolean supressed = false;
 	private boolean dirLeft;
 
@@ -35,7 +36,7 @@ public class ArcBehavior implements Behavior {
 	 * @param motorRight
 	 * @param pilot
 	 */
-	public ArcBehavior(int speed, Motor motorRight, Motor motorLeft,
+	public ArcBehavior(int speed, RMotor motorRight, RMotor motorLeft,
 			boolean dirLeft) {
 		this.speed = speed;
 		this.motorLeft = motorLeft;

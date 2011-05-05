@@ -15,7 +15,10 @@ import lejos.util.Delay;
  * A {@link SonarSensorReader} object is the root of a producer, listeners tree and as 
  * such drives the processing of the sonar data.
  * 
- * Any object that requires sonar sensor data should implements the {@link SensorDataListener}
+ * This implementation will periodically poll the sonar sensor with a certain sample frequency
+ * 
+ * SonarSensorReader objects should be the only objects that directly read the sensor.
+ * Any other object that requires sonar sensor data should implements the {@link SensorDataListener}
  * interface and register itself with a SonarSensorReader object. It should not try to access or
  * read the sonar sensor data in any other way.
  * 
@@ -66,10 +69,13 @@ public class SonarSensorReader implements SensorDataProducer {
 		@Override
 		public void run() {
 			int distance;
+			long timestamp;
 			while(!isStopped){
-				long timestamp = System.currentTimeMillis();
+				timestamp = System.currentTimeMillis();
 				if(timestamp >=lastSampleTimestamp+samplePeriod){
+					
 					distance = sonar.getDistance();
+					lastSampleTimestamp = System.currentTimeMillis();
 					// blocks till new sonar data is available
 					
 					/* note:

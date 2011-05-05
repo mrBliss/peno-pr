@@ -15,8 +15,13 @@ import lejos.nxt.SensorPortListener;
  * A {@link LightSensorReader} object is the root of a producer, listeners tree and as 
  * such drives the processing of the sonar data.
  * 
- * Any object that requires light sensor data should implements the {@link SensorDataListener}
- * interface and register itself with a LIghtSensorReader object. It should not try to access or
+ * This implementation will detect changes in the light sensor output as soon as they occur
+ * by directly subscribing itself as a listener with the sensor itself. 
+ * But will only push those changes to its listeners at a given maximum sample frequency.
+ * 
+ * LightSensorReaderObjects should be the only objects that directly read the sensor.
+ * Any other object that requires light sensor data should implements the {@link SensorDataListener}
+ * interface and register itself with a LightSensorReader object. It should not try to access or
  * read the light sensor data in any other way.
  * 
  * the light sensor data is in the range [0, 1023] where 0 means dark and 1023 means bright.

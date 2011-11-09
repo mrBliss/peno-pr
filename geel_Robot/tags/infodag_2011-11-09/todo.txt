@@ -1,0 +1,45 @@
+* make an abstraction of the robot HW, a bit like the pilot class does.
+  Behaviors should be able to call functional methods like forward, backward, turn left, 
+  perform arc motion, ... independent of the actual construction of the robot.
+  
+  Q: why are we not simply using the TachoPilot class for this?? Do we really need a new implementation?
+  
+* Right now we have a system that navigates by stringing together behavior actions.
+  because behavior actions are called sequentially I am assured that, although each behavior has its own 
+  references to the motors -allowing them to issue motor command at any point in time-,
+  they will not interfere  with each other.
+  The reason that they are called sequentially is essentially because they all live in the same thread.
+  
+  This design is however not thread safe, if an object in a different thread also has references to the motors,
+  then I would need a protocol and communication between these to threads to ensure that actions are not intertwined.
+  
+  A beter and more robust design would be to centralized motor control in one class/one thread.
+  Each object that want to control to motors should first acquire permission and subsequently release its control
+  to allow others to control the robot motion.
+  
+  Such a centralized approach guarantees that actions are serialized and can not interfere with each other. 
+  Even if there are multiple threads involved. And the only contract that needs to be satisfied is that all object
+  interact with the robot actuators through this abstraction instead of direcly accessing the motors.
+  
+  
+* make use of the tachocounters to control the motors.
+  
+  Currently we are only setting the speed of the motors and then sleep for a certain time to move around.
+  This is error prone as you always sleep atleast the given amount, but potentially much longer.
+  In addition, the speed is dependant ont the charge level of the battery.
+  
+  When making use of the tacho counter, the robot movement will no longer be dependant on the battery charge level.
+  In addition it should allow much more fine grained control of the robot.
+  
+  
+  
+* if the BTGateway is not initialized then messages should simply be discarded, the program should not crash!!
+  I.e. the robot should continue on independently if BT is available or not!
+  
+  
+* find something more suited to handle different robot specs.
+
+  you want to be able to define  different specs for different robots.
+  but also reuse the specs of one robot for several different programs.
+  
+  

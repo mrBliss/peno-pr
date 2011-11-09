@@ -1,0 +1,178 @@
+<project name="geel_Robot" default="uploadandrun">
+	<description>
+    	build robot codebase
+    </description>
+	<!--=======================================================================-->
+	<!-- load constants -->
+	<property file="constants.properties" />
+	<!--=======================================================================-->
+	
+	
+	
+
+	<!--=======================================================================-->
+	<!-- primary properties -->
+	
+	<!-- lejos home directory -->		
+	<property name="nxj.home" value="${nxj.home.zadeh}"/>
+
+	<!-- the main class of the program -->
+	<property name="mainClass" value="geel.ConfigTest" />
+
+	<!-- adress of the NXT brick to upload to -->
+	<property name="nxt.address" value="${nxt.address.rood}" />
+	<!--=======================================================================-->
+
+
+
+
+	<!--=======================================================================-->
+	<!-- derived properties -->
+	
+	<!-- load lejos libraries and standard dependencies -->
+	<property file="lejos.properties" />
+	
+	<!-- seperated src and bin directories -->
+	<property name="src" location="./src" />
+	<property name="bin" location="./bin" />
+
+	<!-- output file of linker -->
+	<property name="program" value="${mainClass}"/>
+	<property name="binaryFile" value="${bin}/${program}.nxj" />
+	<!--=======================================================================-->
+
+
+
+
+	<!--=======================================================================-->
+	<!-- ant built targets -->
+
+	<!-- deletes content of build directory ./bin -->
+	<target name="clean" description="clean up all generated build files files">
+
+		<delete>
+			<fileset dir="${bin}">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+	</target>
+
+
+
+	<!-- Compile all the java code from ${src}  -->
+	<target name="compile" depends="clean" description="compile the source">
+		<javac srcdir="${src}" destdir="${bin}">
+			<bootclasspath>
+				<pathelement location="${nxj.classes.jar}" />
+			</bootclasspath>
+		</javac>
+	</target>
+
+
+
+	<!-- Link ${mainClass} and create a signature file ${binaryFile} -->
+	<target name="link" depends="compile" description="link the binary">
+
+		<java classname="js.tinyvm.TinyVM">
+			<arg value="--bootclasspath" />
+			<arg path="${nxj.classes.jar}" />
+			<arg value="--classpath" />
+			<arg path="${bin}" />
+			<arg value="--writeorder" />
+			<arg value="LE" />
+			<arg value="${mainClass}" />
+			<arg value="-o" />
+			<arg value="${binaryFile}" />
+			<arg value="-v" />
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+			</classpath>
+		</java>
+	</target>
+
+
+	<target name="BT scan" description="scan for bluetooth devices">
+		<exec executable="hcitool">
+			<arg value="scan" />
+		</exec>
+	</target>
+
+	<target name="BT name" description="request name of given bluetooth devices">
+		<exec executable="hcitool">
+			<arg value="name" />
+			<arg value="${nxt.address}" />
+		</exec>
+	</target>
+
+	<target name="Open nxjconsole">
+
+		<java classname="lejos.pc.tools.Console" fork="true">
+			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
+			<jvmarg value="-Dnxj.home=${nxj.home}" />
+			<arg value="-b" />
+			<arg value="-d" />
+			<arg value="${nxt.address}" />
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.pctools.jar}" />
+				<pathelement location="${nxj.pccomm.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+				<pathelement location="${nxj.bluecove.jar}" />
+				<pathelement location="${nxj.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
+	</target>
+
+
+	<!-- upload ${binaryFile} to NXT -->
+	<target name="upload" depends="link,BT scan" description="upload the binaryFile">
+
+		<java classname="lejos.pc.tools.NXJUpload" fork="true">
+			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
+			<jvmarg value="-Dnxj.home=${nxj.home}" />
+			<arg value="${binaryFile}" />
+			<arg value="-b" />
+			<arg value="-d" />
+			<arg value="${nxt.address}" />
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.pctools.jar}" />
+				<pathelement location="${nxj.pccomm.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+				<pathelement location="${nxj.bluecove.jar}" />
+				<pathelement location="${nxj.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
+	</target>
+
+
+
+
+	<!-- upload ${binaryFile} to NXT and run it -->
+	<target name="uploadandrun" depends="link,BT scan" description="upload and run the binaryFile">
+
+		<java classname="lejos.pc.tools.NXJUpload" fork="true">
+			<jvmarg value="-Djava.library.path=${nxj.library.path}" />
+			<jvmarg value="-Dnxj.home=${nxj.home}" />
+			<arg value="${binaryFile}" />
+			<arg value="-r" />
+			<arg value="-b" />
+			<arg value="-d" />
+			<arg value="${nxt.address}" />
+			<classpath>
+				<pathelement location="${nxj.jtools.jar}" />
+				<pathelement location="${nxj.pctools.jar}" />
+				<pathelement location="${nxj.pccomm.jar}" />
+				<pathelement location="${nxj.commons.jar}" />
+				<pathelement location="${nxj.bcel.jar}" />
+				<pathelement location="${nxj.bluecove.jar}" />
+				<pathelement location="${nxj.bluecove-gpl.jar}" />
+			</classpath>
+		</java>
+	</target>
+	<!--=======================================================================-->
+</project>

@@ -1,9 +1,7 @@
 package geel;
 
-import geel.barcodes.BitSequence;
 import geel.barcodes.BarcodeDecoder;
-
-import java.util.Hashtable;
+import geel.barcodes.BitSequence;
 
 /**
  * @author jeroendv

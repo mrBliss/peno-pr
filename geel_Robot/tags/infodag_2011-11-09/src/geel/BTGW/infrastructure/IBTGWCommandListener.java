@@ -1,5 +1,5 @@
 package geel.BTGW.infrastructure;
-import geel.BTGW.packets.*;
+import geel.BTGW.packets.BTGWPacket;
 
 /**
  * This interface is to be implemented by every class wanting to be

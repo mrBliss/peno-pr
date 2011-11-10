@@ -1,5 +1,5 @@
 
-mainClass := geel.WallTracker
+mainClass := geel.WallTracker2
 nxtAddress := 00:16:53:02:F7:9D
 
 
@@ -20,3 +20,6 @@ upload: ${binDir}/${nxjFile}
 
 run: ${binDir}/${nxjFile}
 	nxjupload ${binDir}/${nxjFile} -r -b -d ${nxtAddress}
+
+clean:
+	rm -rf ${binDir}/*

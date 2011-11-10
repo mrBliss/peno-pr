@@ -2,8 +2,6 @@ package geel.sensorProcessing;
 
 import geel.BTGW.infrastructure.BTGateway;
 import geel.BTGW.packets.BTGWPacketStatusUpdate;
-import lejos.nxt.SensorPort;
-import lejos.nxt.SensorPortListener;
 import lejos.nxt.TouchSensor;
 
 /**

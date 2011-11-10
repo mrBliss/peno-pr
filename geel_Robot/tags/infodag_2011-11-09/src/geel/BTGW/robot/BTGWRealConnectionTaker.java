@@ -1,6 +1,6 @@
 package geel.BTGW.robot;
 
-import geel.BTGW.infrastructure.*;
+import geel.BTGW.infrastructure.BTGWConnection;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

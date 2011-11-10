@@ -1,12 +1,12 @@
 package geel.sensorProcessing;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import geel.Configurable;
 import geel.RobotSpecs;
 import geel.TrackSpecs;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * this class listeners to light sensor data [0,1023] and maps this to 3 distinct color values:

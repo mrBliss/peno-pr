@@ -1,6 +1,6 @@
 package geel.BTGW.infrastructure;
 
-import geel.BTGW.packets.*;
+import geel.BTGW.packets.BTGWPacket;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

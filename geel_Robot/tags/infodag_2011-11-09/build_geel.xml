@@ -8,13 +8,12 @@
 	<!--=======================================================================-->
 
 
-
 	<!--=======================================================================-->
 	<!-- primary properties -->
 
 	<!-- lejos home directory -->
-	<property name="nxj.home" value="${nxj.home.zadeh}" />
-
+	<property name="nxj.home" value="${nxj.home.zadeh}"/>
+	
 	<!-- the main class of the program -->
 	<property name="mainClass" value="geel.WallTracker2" />
 
@@ -37,9 +36,10 @@
 	<property name="program" value="${mainClass}" />
 	<property name="nxjFile" value="${bin}/${program}.nxj" />
 	<!--=======================================================================-->
-
-
-
+	
+	
+	<!-- create ${bin} dir if it doesn't exists -->
+	<mkdir dir="${bin}"/>
 
 	<!--=======================================================================-->
 	<!-- ant built targets -->
@@ -47,10 +47,8 @@
 	<!-- deletes content of build directory ./bin -->
 	<target name="clean" description="clean up all generated build files files">
 
-		<delete>
-			<fileset dir="${bin}">
-				<include name="**/*" />
-			</fileset>
+		<delete  includeemptydirs="true">
+			<fileset dir="${bin}" includes="**/*" />
 		</delete>
 	</target>
 

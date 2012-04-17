@@ -1,44 +1,24 @@
 package geel.GUI;
 
-import geel.BTGW.infrastructure.*;
-import geel.BTGW.packets.*;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.infrastructure.IBTGWCommandListener;
+import geel.BTGW.packets.BTGWPacket;
+import geel.BTGW.packets.BTGWPacketConfigInteger;
+import geel.BTGW.packets.BTGWPacketConfigRequest;
+import geel.BTGW.packets.BTGWPacketStatusUpdate;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Stroke;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 /**
  * The ConfigurationPanel will allow the user to calibrate the lightsensor on the go
  *   - it reads the latest values automatically

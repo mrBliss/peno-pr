@@ -1,27 +1,19 @@
 package geel.GUI;
 
-import geel.BTGW.infrastructure.*;
-import geel.BTGW.packets.*;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.packets.BTGWPacketManualOverride;
+import geel.BTGW.packets.BTGWPacketManualSteer;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Stroke;
-import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 /**

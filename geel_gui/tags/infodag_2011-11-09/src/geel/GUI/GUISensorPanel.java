@@ -1,7 +1,9 @@
 package geel.GUI;
 
-import geel.BTGW.infrastructure.*;
-import geel.BTGW.packets.*;
+import geel.BTGW.infrastructure.BTGateway;
+import geel.BTGW.infrastructure.IBTGWCommandListener;
+import geel.BTGW.packets.BTGWPacket;
+import geel.BTGW.packets.BTGWPacketStatusUpdate;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -12,7 +14,6 @@ import java.awt.Image;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
